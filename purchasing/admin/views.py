@@ -98,12 +98,12 @@ class ScoutContractAdmin(ContractBaseAdmin):
     form_columns = [
         'contract_type', 'description', 'properties',
         'financial_id', 'expiration_date', 'contract_href', 'parent',
-        'companies', 'followers', 'is_archived', 'department',
+        'children', 'companies', 'followers', 'is_archived', 'department',
         'is_visible'
     ]
 
     form_widget_args = {
-        'parent': {'disabled': True}
+        'parent': {'disabled': True}, 'children': {'disabled': True}
     }
 
     column_labels = dict(
