@@ -124,8 +124,9 @@ class ContractBase(RefreshSearchViewMixin, Model):
         '''Returns a string with the contract's status.
         '''
         if self.expiration_date:
-            if days_from_today(self.expiration_date) <= 0 and self.children and self.is_archived:
-                return 'expired_replaced'
+            if days_from_today(self.expiration_date) <= 0 and \
+                self.children and self.is_archived:
+                    return 'expired_replaced'
             elif days_from_today(self.expiration_date) <= 0:
                 return 'expired'
             elif self.children and self.is_archived:
@@ -242,26 +243,36 @@ class ContractBase(RefreshSearchViewMixin, Model):
 
         filtered_actions = []
 
-        for stage_id, group_of_actions in groupby(all_actions, lambda x: x.contract_stage.stage_id):
+        for stage_id, group_of_actions in groupby(
+            all_actions, lambda x: x.contract_stage.stage_id
+        ):
             actions = list(group_of_actions)
             # append start types
             filtered_actions.append(next(
                 ifilter(
-                    lambda x: x.is_start_type and x.contract_stage.happens_before_or_on(self.current_stage_id), actions
+                    lambda x: x.is_start_type and
+                    x.contract_stage.happens_before_or_on(self.current_stage_id),
+                    actions
                 ),
                 [])
             )
             # append end types
             filtered_actions.append(next(
                 ifilter(
-                    lambda x: x.is_exited_type and x.contract_stage.happens_before(self.current_stage_id), actions
+                    lambda x: x.is_exited_type and
+                    x.contract_stage.happens_before(self.current_stage_id),
+                    actions
                 ), [])
             )
             # extend with all other types
             filtered_actions.extend([x for x in actions if x.is_other_type])
 
         # return the resorted
-        return sorted(ifilter(lambda x: hasattr(x, 'taken_at'), filtered_actions), key=lambda x: x.get_sort_key())
+        return sorted(
+            ifilter(lambda x: hasattr(x, 'taken_at'), filtered_actions),
+            key=lambda x: x.get_sort_key(),
+            reverse=True
+        )
 
     def get_contract_stages(self):
         '''Returns the appropriate stages and their metadata based on a contract id
@@ -270,8 +281,14 @@ class ContractBase(RefreshSearchViewMixin, Model):
             ContractStage.contract_id, ContractStage.stage_id, ContractStage.id,
             ContractStage.entered, ContractStage.exited, Stage.name, Stage.default_message,
             Stage.post_opportunities, ContractBase.description, Stage.id.label('stage_id'),
-            (db.func.extract(db.text('DAYS'), ContractStage.exited - ContractStage.entered)).label('days_spent'),
-            (db.func.extract(db.text('HOURS'), ContractStage.exited - ContractStage.entered)).label('hours_spent')
+            db.func.extract(
+                db.text('DAYS'),
+                ContractStage.exited - ContractStage.entered
+            ).label('days_spent'),
+            db.func.extract(
+                db.text('HOURS'),
+                ContractStage.exited - ContractStage.entered
+            ).label('hours_spent')
         ).join(Stage, Stage.id == ContractStage.stage_id).join(
             ContractBase, ContractBase.id == ContractStage.contract_id
         ).filter(
@@ -458,7 +475,10 @@ class ContractBase(RefreshSearchViewMixin, Model):
         )
 
         self.current_stage_id = next_stage.stage.id
-        return [current_stage.log_exit(user, complete_time), next_stage.log_enter(user, complete_time)]
+        return [
+            current_stage.log_exit(user, complete_time),
+            next_stage.log_enter(user, complete_time)
+        ]
 
     def _transition_to_last(self, user, complete_time):
         exit = self.current_contract_stage.log_exit(user, complete_time)
@@ -518,7 +538,9 @@ class ContractBase(RefreshSearchViewMixin, Model):
         if self.current_stage_id is None:
             actions = self._transition_to_first(user, complete_time)
         elif destination is not None:
-            actions = self._transition_backwards_to_destination(user, destination, complete_time)
+            actions = self._transition_backwards_to_destination(
+                user, destination, complete_time
+            )
         elif self.current_stage_id == self.flow.stage_order[-1]:
             actions = self._transition_to_last(user, complete_time)
         else:
@@ -602,7 +624,9 @@ class ContractBase(RefreshSearchViewMixin, Model):
     def build_subscribers(self):
         '''Build a list of subscribers and others to populate contacts in conductor
         '''
-        department_users, county_purchasers, eorc = User.get_subscriber_groups(self.department_id)
+        department_users, county_purchasers, eorc = User.get_subscriber_groups(
+            self.department_id
+        )
 
         if self.parent is None:
             followers = []
@@ -612,7 +636,9 @@ class ContractBase(RefreshSearchViewMixin, Model):
         subscribers = {
             'Department Users': department_users,
             'Followers': followers,
-            'County Purchasers': [i for i in county_purchasers if i not in department_users],
+            'County Purchasers': [
+                i for i in county_purchasers if i not in department_users
+            ],
             'EORC': eorc
         }
         return subscribers, sum([len(i) for i in subscribers.values()])
