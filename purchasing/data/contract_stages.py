@@ -39,7 +39,9 @@ class ContractStage(Model):
     '''
 
     __tablename__ = 'contract_stage'
-    __table_args__ = (db.Index('ix_contrage_stage_combined_id', 'contract_id', 'stage_id', 'flow_id'), )
+    __table_args__ = (db.Index(
+        'ix_contrage_stage_combined_id', 'contract_id', 'stage_id', 'flow_id'
+    ), )
 
     id = Column(
         db.Integer, Sequence('autoincr_contract_stage_id', start=1, increment=1),
@@ -368,10 +370,10 @@ class ContractStageActionItem(Model):
         '''
         # if we are reversion, we need to get the timestamps from there
         if self.is_start_type or self.is_exited_type:
-            return datetime.datetime.strptime(
+            return (datetime.datetime.strptime(
                 self.action_detail['timestamp'],
                 '%Y-%m-%dT%H:%M:%S'
-            )
+            ), self.taken_at)
         # otherwise, return the taken_at time
         else:
-            return self.taken_at
+            return (self.taken_at, self.taken_at)

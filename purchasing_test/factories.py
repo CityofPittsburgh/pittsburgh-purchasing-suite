@@ -12,6 +12,7 @@ from purchasing.data.contracts import ContractBase, ContractProperty, ContractTy
 from purchasing.data.companies import Company
 from purchasing.data.flows import Flow
 from purchasing.data.stages import Stage
+from purchasing.data.contract_stages import ContractStageActionItem, ContractStage
 
 from purchasing.opportunities.models import (
     Opportunity, RequiredBidDocument, OpportunityDocument, Category,
@@ -80,6 +81,14 @@ class ContractTypeFactory(BaseFactory):
     class Meta:
         model = ContractType
 
+class ContractStageFactory(BaseFactory):
+    id = factory.Sequence(lambda n: 10 + n)
+    stage = factory.SubFactory(StageFactory)
+    flow = factory.SubFactory(FlowFactory)
+
+    class Meta:
+        model = ContractStage
+
 class ContractBaseFactory(BaseFactory):
     id = factory.Sequence(lambda n: 100 + n)
     contract_type = factory.SubFactory(ContractTypeFactory)
@@ -93,6 +102,13 @@ class ContractPropertyFactory(BaseFactory):
 
     class Meta:
         model = ContractProperty
+
+class ContractStageActionItemFactory(BaseFactory):
+    id = factory.Sequence(lambda n: n + 10)
+    contract_stage = factory.SubFactory(ContractStageFactory)
+
+    class Meta:
+        model = ContractStageActionItem
 
 class CategoryFactory(BaseFactory):
     id = factory.Sequence(lambda n: n)

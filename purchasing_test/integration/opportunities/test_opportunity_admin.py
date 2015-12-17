@@ -134,7 +134,7 @@ class TestOpportunitiesAdmin(TestOpportunitiesAdminBase):
         self.assertTrue('Text cannot be more than 500 words!' in new_contract.data)
 
         bad_data['description'] = 'Just right. utf-8 is ¡gréät!'
-        bad_data['planned_submission_end'] = datetime.date.today() + datetime.timedelta(1)
+        bad_data['planned_submission_end'] = datetime.date.today() + datetime.timedelta(days=5)
 
         new_contract = self.client.post('/beacon/admin/opportunities/new', data=bad_data)
         self.assert_flashes('Opportunity post submitted to OMB!', 'alert-success')
@@ -246,7 +246,7 @@ class TestOpportunitiesPublic(TestOpportunitiesAdminBase):
         super(TestOpportunitiesPublic, self).setUp()
         self.opportunity3.is_public = False
         self.opportunity3.categories = set([Category.query.all()[-1]])
-        self.opportunity3.planned_submission_end = datetime.datetime.today() + datetime.timedelta(2)
+        self.opportunity3.planned_submission_end = datetime.datetime.today() + datetime.timedelta(days=5)
         self.vendor = Vendor.create(
             business_name='foobar',
             email='foobar@foo.com',
@@ -378,7 +378,7 @@ class TestOpportunitiesPublic(TestOpportunitiesAdminBase):
                 'title': 'foo', 'description': 'bar',
                 'planned_publish': datetime.date.today(),
                 'planned_submission_start': datetime.date.today(),
-                'planned_submission_end': datetime.date.today() + datetime.timedelta(1),
+                'planned_submission_end': datetime.date.today() + datetime.timedelta(days=5),
                 'save_type': 'publish', 'subcategories-{}'.format(Category.query.all()[-1].id): 'on',
                 'opportunity_type': self.opportunity_type.id
             })
@@ -396,7 +396,7 @@ class TestOpportunitiesPublic(TestOpportunitiesAdminBase):
             'title': 'test_create_edit_publish', 'description': 'bar',
             'planned_publish': datetime.date.today(),
             'planned_submission_start': datetime.date.today(),
-            'planned_submission_end': datetime.date.today() + datetime.timedelta(1),
+            'planned_submission_end': datetime.date.today() + datetime.timedelta(days=5),
             'save_type': 'save', 'subcategories-{}'.format(Category.query.all()[-1].id): 'on',
             'opportunity_type': self.opportunity_type.id
         }
