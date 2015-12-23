@@ -41,7 +41,7 @@ class TestOpportunitiesAdmin(TestOpportunitiesAdminBase):
             'title': 'NEW_OPPORTUNITY', 'description': 'test',
             'planned_publish': datetime.date.today(),
             'planned_submission_start': datetime.date.today(),
-            'planned_submission_end': datetime.date.today() + datetime.timedelta(1),
+            'planned_submission_end': datetime.date.today() + datetime.timedelta(5),
             'is_public': False, 'subcategories-1': 'on', 'subcategories-2': 'on',
             'subcategories-3': 'on', 'subcategories-4': 'on',
             'opportunity_type': self.opportunity_type.id
@@ -82,7 +82,7 @@ class TestOpportunitiesAdmin(TestOpportunitiesAdminBase):
             'title': 'test', 'description': 'test',
             'planned_publish': datetime.date.today(),
             'planned_submission_start': datetime.date.today(),
-            'planned_submission_end': datetime.date.today() + datetime.timedelta(1),
+            'planned_submission_end': datetime.date.today() + datetime.timedelta(5),
             'is_public': False, 'subcategories-{}'.format(Category.query.first().id): 'on',
             'opportunity_type': self.opportunity_type.id
         }

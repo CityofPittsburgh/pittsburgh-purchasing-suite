@@ -115,15 +115,35 @@ class ScoutContractAdmin(ContractBaseAdmin):
     def get_query(self):
         '''Override default get query to limit to assigned contracts
         '''
-        return super(ScoutContractAdmin, self).get_query().filter(
-            ContractBase.current_stage_id == None
+        last_stage = db.session.query(
+            Flow.id,
+            Flow.stage_order[db.func.array_upper(Flow.stage_order, 1)].label('last')
+        ).subquery()
+
+        return super(ScoutContractAdmin, self).get_query().outerjoin(
+            last_stage
+        ).filter(
+            db.or_(
+                (ContractBase.current_stage_id == None)
+                (ContractBase.current_stage_id == last_stage.c.last)
+            )
         )
 
     def get_count_query(self):
         '''Override default get count query to conform to above
         '''
-        return super(ScoutContractAdmin, self).get_count_query().filter(
-            ContractBase.current_stage_id == None,
+        last_stage = db.session.query(
+            Flow.id,
+            Flow.stage_order[db.func.array_upper(Flow.stage_order, 1)].label('last')
+        ).subquery()
+
+        return super(ScoutContractAdmin, self).get_count_query().outerjoin(
+            last_stage
+        ).filter(
+            db.or_(
+                (ContractBase.current_stage_id == None)
+                (ContractBase.current_stage_id == last_stage.c.last)
+            )
         )
 
 class ConductorContractStageAdmin(SuperAdminMixin, ContractBaseAdmin):
@@ -171,17 +191,35 @@ class ConductorContractAdmin(ContractBaseAdmin):
     def get_query(self):
         '''Override default get query to limit to assigned contracts
         '''
-        return super(ConductorContractAdmin, self).get_query().filter(
-            ContractBase.current_stage_id != None,
-            ContractBase.is_visible == False,
+        last_stage = db.session.query(
+            Flow.id,
+            Flow.stage_order[db.func.array_upper(Flow.stage_order, 1)].label('last')
+        ).subquery()
+
+        return super(ConductorContractAdmin, self).get_query().outerjoin(
+            last_stage
+        ).filter(
+            db.or_(
+                ContractBase.current_stage_id != last_stage.c.last,
+                ContractBase.current_stage_id != None
+            ), ContractBase.is_visible == False
         )
 
     def get_count_query(self):
         '''Override default get count query to conform to above
         '''
-        return super(ConductorContractAdmin, self).get_count_query().filter(
-            ContractBase.current_stage_id != None,
-            ContractBase.is_visible == False,
+        last_stage = db.session.query(
+            Flow.id,
+            Flow.stage_order[db.func.array_upper(Flow.stage_order, 1)].label('last')
+        ).subquery()
+
+        return super(ConductorContractAdmin, self).get_count_query().outerjoin(
+            last_stage
+        ).filter(
+            db.or_(
+                ContractBase.current_stage_id != last_stage.c.last,
+                ContractBase.current_stage_id != None
+            ), ContractBase.is_visible == False
         )
 
     def create_form(self):
