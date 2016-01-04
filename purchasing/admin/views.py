@@ -124,8 +124,8 @@ class ScoutContractAdmin(ContractBaseAdmin):
             last_stage
         ).filter(
             db.or_(
-                (ContractBase.current_stage_id == None)
-                (ContractBase.current_stage_id == last_stage.c.last)
+                ContractBase.current_stage_id == None,
+                ContractBase.current_stage_id == last_stage.c.last
             )
         )
 
@@ -141,8 +141,8 @@ class ScoutContractAdmin(ContractBaseAdmin):
             last_stage
         ).filter(
             db.or_(
-                (ContractBase.current_stage_id == None)
-                (ContractBase.current_stage_id == last_stage.c.last)
+                ContractBase.current_stage_id == None,
+                ContractBase.current_stage_id == last_stage.c.last
             )
         )
 
