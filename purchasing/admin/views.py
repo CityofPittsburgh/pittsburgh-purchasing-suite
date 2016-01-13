@@ -146,6 +146,13 @@ class ScoutContractAdmin(ContractBaseAdmin):
             )
         )
 
+    def update_model(self, form, model):
+        # hard reset the children to existing
+        # due to bug in flask-admin with
+        # self-referencial models
+        form.children.data = model.children
+        super(ScoutContractAdmin, self).update_model(form, model)
+
 class ConductorContractStageAdmin(SuperAdminMixin, ContractBaseAdmin):
     column_searchable_list = (
         ContractBase.description, Stage.name
