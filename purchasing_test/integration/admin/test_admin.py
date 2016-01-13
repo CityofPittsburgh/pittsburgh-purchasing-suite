@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from flask import current_app
 from purchasing_test.test_base import BaseTestCase
 from purchasing_test.util import insert_a_user, insert_a_role
-from purchasing_test.factories import UserFactory
 
 class TestAdmin(BaseTestCase):
     render_templates = False
@@ -40,3 +40,16 @@ class TestAdmin(BaseTestCase):
         self.assert200(self.client.get('/admin/'))
         self.assert200(self.client.get('/admin/role/'))
         self.assert200(self.client.get('/admin/user-roles/'))
+
+    def test_admin_views(self):
+        self.login_user(self.superadmin_user)
+
+        for rule in current_app.url_map.iter_rules():
+            if not rule.rule.startswith('/admin') or \
+                'ajax' in rule.rule or \
+                'GET' not in rule.methods or \
+                'static' in rule.rule:
+                    continue
+            else:
+                code = self.client.get(rule.rule).status_code
+                self.assertTrue(code in [200, 302])

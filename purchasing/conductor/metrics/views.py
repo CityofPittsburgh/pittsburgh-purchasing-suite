@@ -85,6 +85,7 @@ def download_all():
         c.description, c.expiration_date, null as parent_expiration,
         d.name as department, u.email as assigned_to,
         cp.value as spec_number, null as parent_spec,
+        f.flow_name as flow_name,
         CASE
             WHEN c.is_archived is True THEN 'archived'
             WHEN c.is_visible is False THEN 'removed from conductor'
@@ -99,6 +100,8 @@ def download_all():
     ON c.department_id = d.id
     LEFT OUTER JOIN contract_type ct
     ON c.contract_type_id = ct.id
+    LEFT OUTER JOIN flow f
+    on c.flow_id = f.id
     WHERE lower(ct.name) in ('county', 'a-bid', 'b-bid')
     AND lower(cp.key) = 'spec number'
     AND c.parent_id is null
@@ -111,6 +114,7 @@ def download_all():
         c.description, c.expiration_date, p.expiration_date as parent_expiration,
         d.name as department, u.email as assigned_to,
         cp.value as spec_number, pcp.value as parent_spec,
+        f.flow_name as flow_name,
         CASE
             WHEN c.is_archived is True THEN 'archived'
             WHEN c.current_stage_id is null then 'not started'
@@ -130,6 +134,8 @@ def download_all():
     ON c.department_id = d.id
     LEFT OUTER JOIN contract_type ct
     ON c.contract_type_id = ct.id
+    LEFT OUTER JOIN flow f
+    on c.flow_id = f.id
     WHERE lower(ct.name) in ('county', 'a-bid', 'b-bid')
     AND (lower(cp.key) = 'spec number' OR lower(pcp.key) = 'spec number')
     AND c.parent_id is not null
