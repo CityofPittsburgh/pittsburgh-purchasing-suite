@@ -459,8 +459,8 @@ class CompanyContactForm(NoCSRFForm):
     See Also:
         :py:class:`~purchasing.data.models.companies.CompanyContact`
     '''
-    first_name = TextField(validators=[DataRequired()])
-    last_name = TextField(validators=[DataRequired()])
+    first_name = TextField(validators=[Optional()])
+    last_name = TextField(validators=[Optional()])
     addr1 = TextField(validators=[Optional()])
     addr2 = TextField(validators=[Optional()])
     city = TextField(validators=[Optional()])
@@ -474,13 +474,13 @@ class CompanyContactForm(NoCSRFForm):
             RequiredIf('city'), Length(min=5, max=5, message='Field must be 5 characters long.')
         ]
     )
-    phone_number = TextField(validators=[DataRequired(), Regexp(
+    phone_number = TextField(validators=[Optional(), Regexp(
         US_PHONE_REGEX, message='Please enter numbers in XXX-XXX-XXXX format'
     )])
     fax_number = TextField(validators=[Optional(), Regexp(
         US_PHONE_REGEX, message='Please enter numbers in XXX-XXX-XXXX format'
     )])
-    email = TextField(validators=[Email(), DataRequired()])
+    email = TextField(validators=[Email(), Optional()])
 
 class CompanyForm(NoCSRFForm):
     '''A form to assign a company to a contract
