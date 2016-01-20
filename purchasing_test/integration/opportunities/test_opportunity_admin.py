@@ -13,6 +13,7 @@ from purchasing.database import db
 from purchasing.extensions import mail
 from purchasing.users.models import User
 from purchasing.opportunities.models import Opportunity, Vendor, Category, OpportunityDocument
+from purchasing.public.models import AcceptedEmailDomains
 from purchasing.opportunities.forms import OpportunityDocumentForm
 
 from purchasing_test.factories import OpportunityDocumentFactory
@@ -74,6 +75,24 @@ class TestOpportunitiesAdmin(TestOpportunitiesAdminBase):
 
         self.assertTrue('1 more' in new_opp_req.data)
 
+    def test_build_opportunity_new_user_invalid_domain(self):
+        self.login_user(self.admin)
+        data = {
+            'department': str(self.department1.id),
+            'contact_email': 'new_email@foo.com',
+            'title': 'test', 'description': 'test',
+            'planned_publish': datetime.date.today(),
+            'planned_submission_start': datetime.date.today(),
+            'planned_submission_end': datetime.date.today() + datetime.timedelta(5),
+            'is_public': False, 'subcategories-{}'.format(Category.query.first().id): 'on',
+            'opportunity_type': self.opportunity_type.id
+        }
+
+        # assert that we create a new user when we build with a new email
+        self.assertEquals(User.query.count(), 2)
+        self.client.post('/beacon/admin/opportunities/new', data=data)
+        self.assertEquals(User.query.count(), 2)
+
     def test_build_opportunity_new_user(self):
         self.login_user(self.admin)
         data = {
@@ -87,6 +106,8 @@ class TestOpportunitiesAdmin(TestOpportunitiesAdminBase):
             'opportunity_type': self.opportunity_type.id
         }
 
+        AcceptedEmailDomains.create(domain='foo.com')
+        db.session.commit()
         # assert that we create a new user when we build with a new email
         self.assertEquals(User.query.count(), 2)
         self.client.post('/beacon/admin/opportunities/new', data=data)
