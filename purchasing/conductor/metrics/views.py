@@ -89,6 +89,7 @@ def download_all():
         CASE
             WHEN c.is_archived is True THEN 'archived'
             WHEN c.is_visible is False THEN 'removed from conductor'
+            WHEN c.has_metrics is False THEN 'removed from metrics'
             ELSE 'not started'
         END as status
     FROM contract c
@@ -119,6 +120,7 @@ def download_all():
             WHEN c.is_archived is True THEN 'archived'
             WHEN c.current_stage_id is null then 'not started'
             WHEN c.id in (select parent_id from contract where parent_id is not null) then 'completed'
+            WHEN c.has_metrics is False THEN 'removed from metrics'
             ELSE 'started'
         END as status
     FROM contract c

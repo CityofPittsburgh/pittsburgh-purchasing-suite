@@ -103,6 +103,8 @@ class ContractBase(RefreshSearchViewMixin, Model):
 
     # conductor information
     is_visible = Column(db.Boolean, default=True, nullable=False)
+    has_metrics = Column(db.Boolean, default=True, nullable=False)
+
     assigned_to = ReferenceCol('users', ondelete='SET NULL', nullable=True)
     assigned = db.relationship('User', backref=backref(
         'assignments', lazy='dynamic', cascade='none'

@@ -260,6 +260,7 @@ class Flow(Model):
 
                 where cs.entered is not null
                 and cs.flow_id = :flow_id
+                and c.has_metrics is true
 
             ) x
             group by 1,2,3,4,5,6,7
