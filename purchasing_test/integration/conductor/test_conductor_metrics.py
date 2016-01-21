@@ -22,6 +22,13 @@ class TestConductorMetrics(TestConductorSetup):
             self.client.get(transition_url_1)
             self.client.get(transition_url_2)
 
+        self.contract3 = insert_a_contract(
+            contract_type=self.county_type, description='scuba repair 2', financial_id=789,
+            expiration_date=datetime.date.today() + datetime.timedelta(120),
+            properties=[{'key': 'Spec Number', 'value': '789'}],
+            is_visible=True, has_metrics=False
+        )
+
     def test_metrics_index(self):
         self.assert200(self.client.get('/conductor/metrics/'))
 
@@ -59,13 +66,18 @@ class TestConductorMetrics(TestConductorSetup):
         )
 
         tsv_data = request.data.split('\n')[:-1]
-        self.assertEquals(len(tsv_data), 4)
+        self.assertEquals(len(tsv_data), 5)
         status = defaultdict(int)
         for i in tsv_data[1:]:
             status[i.split('\t')[-1]] += 1
 
         self.assertEquals(status['not started'], 1)
+        self.assertEquals(status['removed from metrics'], 1)
         self.assertEquals(status['started'], 2)
 
     def test_metrics_data(self):
-        self.assert200(self.client.get('/conductor/metrics/overview/{}/data'.format(self.flow.id)))
+        data = self.client.get('/conductor/metrics/overview/{}/data'.format(self.flow.id))
+        self.assert200(data)
+        self.assertEquals(len(data.json['complete']), 2)
+        self.assertEquals(len(data.json['current']), 0)
+

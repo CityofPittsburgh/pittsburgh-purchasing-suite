@@ -57,13 +57,13 @@ class TestConductorSetup(BaseTestCase):
         self.contract1 = insert_a_contract(
             contract_type=self.county_type, description='scuba supplies', financial_id=123,
             expiration_date=datetime.date.today(), properties=[{'key': 'Spec Number', 'value': '123'}],
-            is_visible=True, department=self.department
+            is_visible=True, department=self.department, has_metrics=True
         )
         self.contract2 = insert_a_contract(
             contract_type=self.county_type, description='scuba repair', financial_id=456,
             expiration_date=datetime.date.today() + datetime.timedelta(120),
             properties=[{'key': 'Spec Number', 'value': '456'}],
-            is_visible=True
+            is_visible=True, has_metrics=True
         )
 
         self.category = CategoryFactory.create()

@@ -57,12 +57,13 @@ class ContractBaseAdmin(AuthMixin, BaseModelViewAdmin):
 
     column_list = [
         'contract_type', 'description', 'financial_id', 'expiration_date',
-        'properties', 'companies', 'is_archived'
+        'properties', 'companies', 'is_archived', 'has_metrics'
     ]
 
     column_labels = dict(
         contract_href='Link to Contract PDF', financial_id='Controller #',
-        properties='Contract Properties', expiration_date='Expiration', is_archived='Archived',
+        properties='Contract Properties', expiration_date='Expiration',
+        is_archived='Archived', has_metrics='Appears in Metrics'
     )
 
     form_args = {
@@ -99,7 +100,7 @@ class ScoutContractAdmin(ContractBaseAdmin):
         'contract_type', 'description', 'properties',
         'financial_id', 'expiration_date', 'contract_href', 'parent',
         'children', 'companies', 'followers', 'is_archived', 'department',
-        'is_visible'
+        'is_visible', 'has_metrics'
     ]
 
     form_widget_args = {
@@ -109,7 +110,7 @@ class ScoutContractAdmin(ContractBaseAdmin):
     column_labels = dict(
         contract_href='Link to Contract PDF', financial_id='Controller #',
         properties='Contract Properties', expiration_date='Expiration', is_archived='Archived',
-        is_visible='Visible in Conductor'
+        is_visible='Visible in Conductor', has_metrics='Appears in Metrics'
     )
 
     def get_query(self):
