@@ -65,12 +65,6 @@ class TestConductorSetup(BaseTestCase):
             properties=[{'key': 'Spec Number', 'value': '456'}],
             is_visible=True, has_metrics=True
         )
-        self.contract3 = insert_a_contract(
-            contract_type=self.county_type, description='scuba repair 2', financial_id=789,
-            expiration_date=datetime.date.today() + datetime.timedelta(120),
-            properties=[{'key': 'Spec Number', 'value': '789'}],
-            is_visible=True, has_metrics=False
-        )
 
         self.category = CategoryFactory.create()
 

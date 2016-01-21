@@ -22,6 +22,13 @@ class TestConductorMetrics(TestConductorSetup):
             self.client.get(transition_url_1)
             self.client.get(transition_url_2)
 
+        self.contract3 = insert_a_contract(
+            contract_type=self.county_type, description='scuba repair 2', financial_id=789,
+            expiration_date=datetime.date.today() + datetime.timedelta(120),
+            properties=[{'key': 'Spec Number', 'value': '789'}],
+            is_visible=True, has_metrics=False
+        )
+
     def test_metrics_index(self):
         self.assert200(self.client.get('/conductor/metrics/'))
 
