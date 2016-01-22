@@ -6,11 +6,12 @@ from flask import (
     render_template, current_app,
     request, abort, flash, redirect, url_for
 )
-from flask_login import current_user
+from flask_security import current_user
+from flask_security.decorators import roles_accepted
 
 from purchasing.database import db
 from purchasing.utils import SimplePagination
-from purchasing.decorators import wrap_form, requires_roles
+from purchasing.decorators import wrap_form
 
 from purchasing.scout.forms import SearchForm, NoteForm
 from purchasing.users.models import Department
@@ -309,7 +310,7 @@ def feedback(contract_id):
     abort(404)
 
 @blueprint.route('/contracts/<int:contract_id>/subscribe')
-@requires_roles('staff', 'admin', 'superadmin', 'conductor')
+@roles_accepted('staff', 'admin', 'superadmin', 'conductor')
 def subscribe(contract_id):
     '''Subscribes a user to receive updates about a particular contract
 
@@ -339,7 +340,7 @@ def subscribe(contract_id):
         abort(404)
 
 @blueprint.route('/contracts/<int:contract_id>/unsubscribe')
-@requires_roles('staff', 'admin', 'superadmin', 'conductor')
+@roles_accepted('staff', 'admin', 'superadmin', 'conductor')
 def unsubscribe(contract_id):
     '''Unsubscribes a user from receiving updates about a particular contract
 

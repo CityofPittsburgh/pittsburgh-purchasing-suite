@@ -1,0 +1,14 @@
+{% extends "public/layout.html" %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6 col-sm-offset-3">
+      {% include "security/_messages.html" %}
+      {% block form %}{% endblock %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

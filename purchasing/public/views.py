@@ -9,15 +9,11 @@ import json
 from flask import (
     render_template, jsonify, current_app, send_from_directory, request
 )
-from purchasing.extensions import login_manager, cache
+from purchasing.extensions import cache
 from purchasing.users.models import User
 from purchasing.public.models import AppStatus
 
 from purchasing.public import blueprint
-
-@login_manager.user_loader
-def load_user(userid):
-    return User.get_by_id(int(userid))
 
 @blueprint.route("/", methods=["GET", "POST"])
 def home():

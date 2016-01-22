@@ -23,7 +23,7 @@
 
         </div>
 
-        {% if current_user.role.name in ['admin', 'superadmin'] %}
+        {% if current_user.is_admin() %}
         <p>
           <a href="{{ url_for('contract.edit_view', id=contract.id) }}">Edit this contract</a>
         </p>

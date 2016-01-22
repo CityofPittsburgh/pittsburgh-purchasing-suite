@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
-from flask.ext.login import UserMixin, AnonymousUserMixin
+from flask.ext.login import AnonymousUserMixin
+from flask.ext.security import UserMixin, RoleMixin
 
 from purchasing.database import Column, db, Model, ReferenceCol, SurrogatePK
 from sqlalchemy.orm import backref
 
-class Role(SurrogatePK, Model):
+roles_users = db.Table('roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('roles.id')))
+
+class Role(SurrogatePK, RoleMixin, Model):
     '''Model to handle view-based permissions
 
     Attributes:
@@ -13,6 +18,7 @@ class Role(SurrogatePK, Model):
     '''
     __tablename__ = 'roles'
     name = Column(db.String(80), unique=True, nullable=False)
+    description = Column(db.String(255), nullable=True)
 
     def __repr__(self):
         return '<Role({name})>'.format(name=self.name)
@@ -59,10 +65,9 @@ class User(UserMixin, SurrogatePK, Model):
     last_name = Column(db.String(30), nullable=True)
     active = Column(db.Boolean(), default=True)
 
-    role_id = ReferenceCol('roles', ondelete='SET NULL', nullable=True)
-    role = db.relationship(
-        'Role', backref=backref('users', lazy='dynamic'),
-        foreign_keys=role_id, primaryjoin='User.role_id==Role.id'
+    roles = db.relationship(
+        'Role', secondary=roles_users,
+        backref=backref('users', lazy='dynamic'),
     )
 
     department_id = ReferenceCol('department', ondelete='SET NULL', nullable=True)
@@ -71,11 +76,26 @@ class User(UserMixin, SurrogatePK, Model):
         foreign_keys=department_id, primaryjoin='User.department_id==Department.id'
     )
 
+    password = db.Column(db.String(255))
+
+    confirmed_at = db.Column(db.DateTime)
+    last_login_at = db.Column(db.DateTime)
+    current_login_at = db.Column(db.DateTime)
+    last_login_ip = db.Column(db.String(255))
+    current_login_ip = db.Column(db.String(255))
+    login_count = db.Column(db.Integer)
+
     def __repr__(self):
         return '<User({email!r})>'.format(email=self.email)
 
     def __unicode__(self):
         return self.email
+
+    @property
+    def role(self):
+        if len(self.roles) > 0:
+            return self.roles[0]
+        return Role(name='')
 
     @property
     def full_name(self):
@@ -95,10 +115,8 @@ class User(UserMixin, SurrogatePK, Model):
 
     @classmethod
     def county_purchaser_factory(cls):
-        return cls.query.join(
-            Role, User.role_id == Role.id
-        ).filter(
-            Role.name == 'county'
+        return cls.query.filter(
+            User.roles.any(Role.name == 'county')
         )
 
     @classmethod
@@ -132,7 +150,21 @@ class User(UserMixin, SurrogatePK, Model):
             True if user's role is either conductor, admin, or superadmin,
             False otherwise
         '''
-        return self.role.name in ('conductor', 'admin', 'superadmin')
+        return any([
+            self.has_role('conductor'),
+            self.has_role('admin'),
+            self.has_role('superadmin')
+        ])
+
+    def is_admin(self):
+        '''Check if user can access admin applications
+
+        Returns:
+            True if user's role is admin or superadmin, False otherwise
+        '''
+        return any([
+            self.has_role('admin'), self.has_role('superadmin')
+        ])
 
     def print_pretty_name(self):
         '''Generate long version text representation of user
@@ -240,3 +272,9 @@ class AnonymousUser(AnonymousUserMixin):
 
     def __init__(self, *args, **kwargs):
         super(AnonymousUser, self).__init__(*args, **kwargs)
+
+    def is_conductor(self):
+        return False
+
+    def is_admin(self):
+        return False

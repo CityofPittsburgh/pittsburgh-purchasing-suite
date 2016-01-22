@@ -3,6 +3,7 @@
 
 {% block content %}
 <div class="container">
+  <div class="row">
 
   {{ super() }}
 
@@ -36,6 +37,16 @@
       <button type="submit" class="btn btn-success">Submit</button>
     </div>
   </form>
+  </div>
+
+  {% if security.changeable %}
+  <div class="spacer-10"></div>
+  <div class="row">
+    <div class="col-sm-offset-3">
+      <li><a href="{{ url_for_security('change_password') }}">Change your password</a></li>
+    </div>
+  </div>
+  {% endif %}
 
   {% if user.contracts_following|length > 0 %}
   <div class="spacer-20"></div>

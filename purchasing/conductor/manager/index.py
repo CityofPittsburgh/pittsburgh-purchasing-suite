@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from flask import request, render_template, current_app
-from flask_login import current_user
+from flask_security import current_user
 
-from purchasing.decorators import requires_roles
+from flask_security.decorators import roles_accepted
 from purchasing.database import db
 
 from purchasing.data.stages import Stage
@@ -19,7 +19,7 @@ from purchasing.users.models import User, Role, Department
 from purchasing.conductor.manager import blueprint
 
 @blueprint.route('/')
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def index():
     '''Main conductor index page/splash view
 
@@ -137,8 +137,8 @@ def index():
         User.first_name, User.email
     ).order_by(ContractBase.expiration_date).all()
 
-    conductors = User.query.join(Role, User.role_id == Role.id).filter(
-        Role.name == 'conductor',
+    conductors = User.query.filter(
+        User.roles.any(Role.name == 'conductor'),
         User.email != current_user.email
     ).all()
 

@@ -52,6 +52,7 @@ node_modules/
 
 # Flask-assets output
 css
+public.js
 common.js
 opportunities.js
 scout.js

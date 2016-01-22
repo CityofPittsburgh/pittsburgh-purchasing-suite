@@ -2,7 +2,7 @@
 
 from flask import render_template, redirect, url_for, flash, abort
 
-from purchasing.decorators import requires_roles
+from flask_security.decorators import roles_accepted
 from purchasing.data.stages import Stage
 from purchasing.data.flows import Flow
 from purchasing.conductor.forms import FlowForm, NewFlowForm
@@ -10,7 +10,7 @@ from purchasing.conductor.forms import FlowForm, NewFlowForm
 from purchasing.conductor.manager import blueprint
 
 @blueprint.route('/flow/new', methods=['GET', 'POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def new_flow():
     '''Create a new flow
 
@@ -40,7 +40,7 @@ def new_flow():
     return render_template('conductor/flows/new.html', stages=stages, form=form)
 
 @blueprint.route('/flows')
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def flows_list():
     '''List all flows
 
@@ -56,7 +56,7 @@ def flows_list():
     return render_template('conductor/flows/browse.html', active=active, archived=archived)
 
 @blueprint.route('/flow/<int:flow_id>', methods=['GET', 'POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def flow_detail(flow_id):
     '''View/edit a flow's details
 

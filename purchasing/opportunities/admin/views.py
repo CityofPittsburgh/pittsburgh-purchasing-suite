@@ -6,11 +6,10 @@ from flask import (
     render_template, url_for, Response, stream_with_context,
     redirect, flash, abort, request, current_app
 )
-from flask_login import current_user
+from flask_security import current_user
 
 from purchasing.database import db
-from purchasing.extensions import login_manager
-from purchasing.decorators import requires_roles
+from flask_security.decorators import roles_accepted
 from purchasing.users.models import User
 
 from purchasing.opportunities.models import Opportunity, Vendor, OpportunityDocument
@@ -19,12 +18,8 @@ from purchasing.opportunities.forms import OpportunityForm
 from purchasing.notifications import Notification
 from purchasing.opportunities.admin import blueprint
 
-@login_manager.user_loader
-def load_user(userid):
-    return User.get_by_id(int(userid))
-
 @blueprint.route('/opportunities/new', methods=['GET', 'POST'])
-@requires_roles('staff', 'admin', 'superadmin', 'conductor')
+@roles_accepted('staff', 'admin', 'superadmin', 'conductor')
 def new():
     '''Create a new opportunity
 
@@ -58,7 +53,7 @@ def new():
     )
 
 @blueprint.route('/opportunities/<int:opportunity_id>', methods=['GET', 'POST'])
-@requires_roles('staff', 'admin', 'superadmin', 'conductor')
+@roles_accepted('staff', 'admin', 'superadmin', 'conductor')
 def edit(opportunity_id):
     '''Edit an opportunity
 
@@ -101,7 +96,7 @@ def edit(opportunity_id):
     abort(404)
 
 @blueprint.route('/opportunities/<int:opportunity_id>/document/<int:document_id>/remove')
-@requires_roles('staff', 'admin', 'superadmin', 'conductor')
+@roles_accepted('staff', 'admin', 'superadmin', 'conductor')
 def remove_document(opportunity_id, document_id):
     '''Remove a particular opportunity document
 
@@ -130,7 +125,7 @@ def remove_document(opportunity_id, document_id):
     return redirect(url_for('opportunities_admin.edit', opportunity_id=opportunity_id))
 
 @blueprint.route('/opportunities/<int:opportunity_id>/publish')
-@requires_roles('admin', 'superadmin', 'conductor')
+@roles_accepted('admin', 'superadmin', 'conductor')
 def publish(opportunity_id):
     '''Publish an opportunity
 
@@ -173,7 +168,7 @@ u'''BEACON APPROVED: ID: {} | Title: {} | Publish Date: {} | Submission Start Da
     abort(404)
 
 @blueprint.route('/opportunities/pending')
-@requires_roles('staff', 'admin', 'superadmin', 'conductor')
+@roles_accepted('staff', 'admin', 'superadmin', 'conductor')
 def pending():
     '''View which contracts are currently pending approval
 
@@ -200,7 +195,7 @@ def pending():
     )
 
 @blueprint.route('/opportunities/<int:opportunity_id>/archive')
-@requires_roles('admin', 'superadmin', 'conductor')
+@roles_accepted('admin', 'superadmin', 'conductor')
 def archive(opportunity_id):
     '''Archives opportunities in pending view
 
@@ -228,7 +223,7 @@ u'''BEACON ARCHIVED: ID: {} | Title: {} | Publish Date: {} | Submission Start Da
     abort(404)
 
 @blueprint.route('/signups')
-@requires_roles('staff', 'admin', 'superadmin', 'conductor')
+@roles_accepted('staff', 'admin', 'superadmin', 'conductor')
 def signups():
     '''Basic dashboard view for category-level signups
 

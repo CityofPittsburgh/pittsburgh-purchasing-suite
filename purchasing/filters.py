@@ -7,7 +7,7 @@ import re
 import pytz
 import dateutil.parser
 from flask import flash, request, url_for, current_app
-from flask_login import current_user
+from flask_security import current_user
 
 from purchasing.compat import basestring
 from jinja2 import evalcontextfilter, Markup

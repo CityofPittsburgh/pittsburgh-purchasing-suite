@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug import secure_filename
 
 from flask import current_app
-from flask_login import current_user
+from flask_security import current_user
 
 from purchasing.database import db
 from purchasing.filters import better_title

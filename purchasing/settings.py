@@ -37,7 +37,17 @@ class Config(object):
     CONDUCTOR_TYPE = 'County'
     CONDUCTOR_DEPARTMENT = 'Multiple Departments'
     EXTERNAL_LINK_WARNING = os_env.get('EXTERNAL_LINK_WARNING', None)
-
+    SECURITY_EMAIL_SENDER = MAIL_DEFAULT_SENDER
+    SECURITY_CONFIRMABLE = True
+    SECURITY_REGISTERABLE = True
+    SECURITY_RECOVERABLE = True
+    SECURITY_TRACKABLE = True
+    SECURITY_CHANGEABLE = True
+    SECURITY_TOKEN_MAX_AGE = 60 * 60 * 24 * 30
+    # more of a namespacing than a traditional salt, see
+    # http://pythonhosted.org/itsdangerous/#the-salt
+    # for more information
+    SECURITY_PASSWORD_SALT = os_env.get('SECURITY_PASSWORD_SALT', 'salty')
 
 class ProdConfig(Config):
     """Production configuration."""
@@ -56,6 +66,7 @@ class ProdConfig(Config):
     CACHE_TYPE = 'redis'
     CACHE_REDIS_URL = os_env.get('REDIS_URL', 'redis://localhost:6379/0')
     CACHE_DEFAULT_TIMEOUT = 30
+    SECURITY_PASSWORD_HASH = 'bcrypt'
 
 class DevConfig(Config):
     """Development configuration."""
@@ -76,6 +87,7 @@ class DevConfig(Config):
     UGLIFYJS_BIN = os.path.join(PROJECT_ROOT, 'node_modules', '.bin', 'uglifyjs')
     LESS_BIN = os.path.join(PROJECT_ROOT, 'node_modules', '.bin', 'lessc')
     # MAIL_SUPPRESS_SEND = True
+    SECURITY_PASSWORD_HASH = 'bcrypt'
 
 class TestConfig(Config):
     TESTING = True
@@ -90,3 +102,4 @@ class TestConfig(Config):
     UPLOAD_FOLDER = UPLOAD_DESTINATION
     CELERY_ALWAYS_EAGER = True
     DISPLAY_TIMEZONE = pytz.timezone('UTC')
+    SECURITY_PASSWORD_SALT = 'test'
