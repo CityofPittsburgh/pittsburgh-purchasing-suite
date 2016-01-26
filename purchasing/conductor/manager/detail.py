@@ -457,7 +457,9 @@ def start_work(contract_id=-1):
     if contract:
         first_stage = contract.get_first_stage()
 
-        if first_stage and first_stage.stage_id != contract.current_stage_id:
+        if first_stage and contract.completed_last_stage():
+            pass
+        elif first_stage and first_stage.stage_id != contract.current_stage_id:
             return redirect(url_for('conductor.detail', contract_id=contract.id))
         elif first_stage:
             contract.start = localize_datetime(contract.get_first_stage().entered)
@@ -471,7 +473,7 @@ def start_work(contract_id=-1):
                 db.session, ContractBase, description=form.data.get('description'),
                 department=form.data.get('department'), is_visible=False
             )
-        elif not first_stage:
+        elif not first_stage or contract.completed_last_stage():
             contract = ContractBase.clone(contract)
             contract.description = form.data.get('description')
             contract.department = form.data.get('department')
