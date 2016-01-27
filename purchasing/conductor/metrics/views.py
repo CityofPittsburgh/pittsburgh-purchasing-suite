@@ -85,12 +85,13 @@ def download_all():
         c.description, c.expiration_date, null as parent_expiration,
         d.name as department, u.email as assigned_to,
         cp.value as spec_number, null as parent_spec,
-        f.flow_name as flow_name,
+        f.flow_name as flow_name, c.has_metrics as visible_in_metrics,
         CASE
+            WHEN c.id in (select parent_id from contract where parent_id is not NULL) AND c.is_archived is True then 'completed'
             WHEN c.is_archived is True THEN 'archived'
-            WHEN c.is_visible is False THEN 'removed from conductor'
-            WHEN c.has_metrics is False THEN 'removed from metrics'
-            ELSE 'not started'
+            WHEN c.is_visible is False and c.current_stage_id is NULL THEN 'removed from conductor'
+            WHEN c.current_stage_id is NULL THEN 'not started'
+            WHEN c.current_stage_id is NOT NULL THEN 'started'
         END as status
     FROM contract c
     LEFT OUTER JOIN contract_property cp
@@ -106,7 +107,6 @@ def download_all():
     WHERE lower(ct.name) in ('county', 'a-bid', 'b-bid')
     AND lower(cp.key) = 'spec number'
     AND c.parent_id is null
-    AND c.id not in (select parent_id from contract where parent_id is not null)
 
     UNION ALL
 
@@ -115,13 +115,13 @@ def download_all():
         c.description, c.expiration_date, p.expiration_date as parent_expiration,
         d.name as department, u.email as assigned_to,
         cp.value as spec_number, pcp.value as parent_spec,
-        f.flow_name as flow_name,
+        f.flow_name as flow_name, c.has_metrics as visible_in_metrics,
         CASE
+            WHEN c.id in (select parent_id from contract where parent_id is not NULL) AND c.is_archived is True then 'completed'
             WHEN c.is_archived is True THEN 'archived'
-            WHEN c.current_stage_id is null then 'not started'
-            WHEN c.id in (select parent_id from contract where parent_id is not null) then 'completed'
-            WHEN c.has_metrics is False THEN 'removed from metrics'
-            ELSE 'started'
+            WHEN c.is_visible is False and c.current_stage_id is NULL THEN 'removed from conductor'
+            WHEN c.current_stage_id is NULL then 'not started'
+            WHEN c.current_stage_id is NOT NULL then 'started'
         END as status
     FROM contract c
     INNER JOIN contract p

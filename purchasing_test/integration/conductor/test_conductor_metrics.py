@@ -26,7 +26,7 @@ class TestConductorMetrics(TestConductorSetup):
             contract_type=self.county_type, description='scuba repair 2', financial_id=789,
             expiration_date=datetime.date.today() + datetime.timedelta(120),
             properties=[{'key': 'Spec Number', 'value': '789'}],
-            is_visible=True, has_metrics=False
+            is_visible=True
         )
 
     def test_metrics_index(self):
@@ -55,8 +55,20 @@ class TestConductorMetrics(TestConductorSetup):
         insert_a_contract(
             contract_type=self.county_type, description='scuba supplies 2', financial_id=789,
             expiration_date=datetime.date.today(), properties=[{'key': 'Spec Number', 'value': '789'}],
-            is_visible=True, department=self.department, is_archived=False
+            is_visible=False, department=self.department, is_archived=False
         )
+        insert_a_contract(
+            contract_type=self.county_type, description='scuba supplies 3', financial_id=101,
+            expiration_date=datetime.date.today(), properties=[{'key': 'Spec Number', 'value': '789'}],
+            is_visible=True, department=self.department, is_archived=True
+        )
+        insert_a_contract(
+            contract_type=self.county_type, description='scuba supplies 4', financial_id=102,
+            expiration_date=datetime.date.today(), properties=[{'key': 'Spec Number', 'value': '789'}],
+            is_visible=True, department=self.department, is_archived=False, parent_id=self.contract1.id
+        )
+        self.contract1.update(is_archived=True)
+        self.contract3.update(has_metrics=False)
         db.session.commit()
         request = self.client.get('/conductor/metrics/download/all', follow_redirects=True)
         self.assertEquals(request.mimetype, 'text/tsv')
@@ -66,14 +78,21 @@ class TestConductorMetrics(TestConductorSetup):
         )
 
         tsv_data = request.data.split('\n')[:-1]
-        self.assertEquals(len(tsv_data), 5)
-        status = defaultdict(int)
+        # eight contracts + a header row
+        self.assertEquals(len(tsv_data), 9)
+        status, in_metrics = defaultdict(int), defaultdict(int)
         for i in tsv_data[1:]:
             status[i.split('\t')[-1]] += 1
+            in_metrics[i.split('\t')[-2]] += 1
 
-        self.assertEquals(status['not started'], 1)
-        self.assertEquals(status['removed from metrics'], 1)
+        self.assertEquals(status['archived'], 1)
+        self.assertEquals(status['completed'], 1)
         self.assertEquals(status['started'], 2)
+        self.assertEquals(status['not started'], 3)
+        self.assertEquals(status['removed from conductor'], 1)
+
+        self.assertEquals(in_metrics['True'], 7)
+        self.assertEquals(in_metrics['False'], 1)
 
     def test_metrics_data(self):
         data = self.client.get('/conductor/metrics/overview/{}/data'.format(self.flow.id))
