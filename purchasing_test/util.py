@@ -99,7 +99,7 @@ def insert_a_user(email=None, department=None, role=None, pw='password'):
         else:
             user = UserFactory.create(
                 roles=[role], department=department,
-                password=pw
+                password=pw, confirmed_at=datetime.datetime.now()
             )
         return user
     except IntegrityError:

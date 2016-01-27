@@ -103,7 +103,7 @@
         </ul>
         {% else %}
         <p>No one is following this contract! <br>
-          {% if current_user.role.name != 'anonymous' %}
+          {% if not current_user.is_anonymous %}
           <a href="{{ url_for('scout.subscribe', contract_id=contract.id, next=path) }}">Subscribe for updates</a>
           {% endif %}
         </p>
