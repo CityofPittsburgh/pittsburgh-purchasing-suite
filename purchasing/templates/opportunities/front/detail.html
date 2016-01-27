@@ -106,7 +106,7 @@
         {% if opportunity.has_docs %}
         <div class="row">
           <h3><strong>Download Opportunity Documents</strong></h3>
-          <p>Not sure where to start? The document labeled as an RFP (Request for Proposals), RFQ (Request for Qualifications), or IFB (Invitation for Bid) will contained more detailed instructions about the project timeline, what we're looking for, and how to put together a proposal.</p>
+          <p>Not sure where to start? The document labeled as an RFP (Request for Proposals), RFQ (Request for Qualifications), or IFB (Invitation for Bid) will contain more detailed instructions about the project timeline, what we're looking for, and how to put together a proposal.</p>
           <ul>
           {% for document in opportunity.opportunity_documents %}
           <li><a href="{{ document.get_href() }}">{{ document.clean_name() }}</a></li>
