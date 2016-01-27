@@ -5,9 +5,6 @@ in app.py
 
 from purchasing.decorators import ConductorAuthMixin
 
-from flask_bcrypt import Bcrypt
-bcrypt = Bcrypt()
-
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 

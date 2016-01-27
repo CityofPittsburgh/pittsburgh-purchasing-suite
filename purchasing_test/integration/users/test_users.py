@@ -3,6 +3,8 @@ from purchasing.users.models import User
 from purchasing_test.factories import RoleFactory, AcceptedEmailDomainsFactory
 
 class TestUsers(BaseTestCase):
+    render_templates = True
+
     def setUp(self):
         super(TestUsers, self).setUp()
         RoleFactory.create(name='staff')

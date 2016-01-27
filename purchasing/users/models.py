@@ -5,9 +5,11 @@ from flask.ext.security import UserMixin, RoleMixin
 from purchasing.database import Column, db, Model, ReferenceCol, SurrogatePK
 from sqlalchemy.orm import backref
 
-roles_users = db.Table('roles_users',
+roles_users = db.Table(
+    'roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('roles.id')))
+    db.Column('role_id', db.Integer(), db.ForeignKey('roles.id'))
+)
 
 class Role(SurrogatePK, RoleMixin, Model):
     '''Model to handle view-based permissions
@@ -15,6 +17,7 @@ class Role(SurrogatePK, RoleMixin, Model):
     Attributes:
         id: primary key
         name: role name
+        description: description of an individual role
     '''
     __tablename__ = 'roles'
     name = Column(db.String(80), unique=True, nullable=False)
@@ -44,6 +47,15 @@ class Role(SurrogatePK, RoleMixin, Model):
         '''
         return cls.query.filter(cls.name != 'superadmin')
 
+    @classmethod
+    def staff_factory(cls):
+        '''Factory to return the staff role
+
+        Returns:
+            Role object with the name 'staff'
+        '''
+        return cls.query.filter(cls.name == 'staff')
+
 class User(UserMixin, SurrogatePK, Model):
     '''User model
 
@@ -53,8 +65,7 @@ class User(UserMixin, SurrogatePK, Model):
         first_name: first name of user
         last_name: last name of user
         active: whether user is currently active or not
-        role_id: foreign key of user's role
-        role: relationship of user to role table
+        roles: relationship of user to role table
         department_id: foreign key of user's department
         department: relationship of user to department table
     '''
@@ -254,7 +265,8 @@ class AnonymousUser(AnonymousUserMixin):
     '''Custom mixin for handling anonymous (non-logged-in) users
 
     Attributes:
-        role: :py:class:`~purchasing.user.models.Role`
+        roles: List of a single
+            :py:class:`~purchasing.user.models.Role`
             object with name set to 'anonymous'
         department: :py:class:`~purchasing.user.models.Department`
             object with name set to 'anonymous'
@@ -266,7 +278,7 @@ class AnonymousUser(AnonymousUserMixin):
         which contains a number of class and instance methods around
         determining if users are currently logged in.
     '''
-    role = Role(name='anonymous')
+    roles = [Role(name='anonymous')]
     department = Department(name='anonymous')
     id = -1
 

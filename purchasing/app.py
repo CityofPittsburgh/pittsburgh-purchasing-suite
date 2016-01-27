@@ -18,8 +18,7 @@ from flask_security import current_user, SQLAlchemyUserDatastore
 
 from purchasing.assets import assets, test_assets
 from purchasing.extensions import (
-    bcrypt, cache, db,
-    migrate, debug_toolbar, admin, s3, mail,
+    cache, db, migrate, debug_toolbar, admin, s3, mail,
     security
 )
 
@@ -87,7 +86,6 @@ def create_app():
 
 def register_extensions(app):
     test_assets.init_app(app) if app.config.get('TESTING') else assets.init_app(app)
-    bcrypt.init_app(app)
     cache.init_app(app)
     db.init_app(app)
     debug_toolbar.init_app(app)

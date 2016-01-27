@@ -1,19 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from flask import request, render_template, current_app
+from flask import request, render_template
 
 from werkzeug.wrappers import Response
 from flask_security import current_user
 from functools import wraps
-
-def logview(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        current_app.logger.info('SHERPAVIEW - Viewing page at {}'.format(
-            request.path
-        ))
-        return f(*args, **kwargs)
-    return decorated_function
 
 def wrap_form(form=None, form_name=None, template=None):
     '''

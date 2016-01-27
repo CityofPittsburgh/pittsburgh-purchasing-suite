@@ -47,7 +47,8 @@ psql -c 'create database purchasing;'
 # set environmental variables - it is recommended that you set these for your
 # your virtualenv, using a tool like autoenv or by modifying your activate script
 export ADMIN_EMAIL='youremail@someplace.net'
-export CONFIG=purchasing.settings.DevConfig
+export DEFAULT_DOMAIN='someplace.net'
+export CONFIG=beacon.settings.DevConfig
 # this next command will do all installs, add tables to the database,
 # and insert seed data (note that this needs an internet connection to
 # scrape data from Allegheny County)
@@ -122,15 +123,15 @@ bower install
 
 **login and user accounts**
 
-Right now, the Pittsburgh Purchasing Suite uses [persona](https://login.persona.org/about) to handle authentication. The app uses its own user database to manage roles and object-based authorization. You will need to sign in through persona and then enter yourself into the database in order to have access to admin and other pages.
-
 A manage task has been created to allow you to quickly create a user to access the admin and other staff-only tasks. To add an email, run the following command (NOTE: if you updated your database as per above, you will probably want to give youself a role of 1, which will give you superadmin privledges), putting your email/desired role in the appropriate places:
 
 ```bash
-python manage.py seed_user -e <your-email-here> -r <your-desired-role>
+python manage.py seed_user -e <your-email-here> -r <your-desired-role> -p <your-desired password>
+# if you leave the password blank, it will default to `password`
 ```
 
-Now, logging in through persona should also give you access to the app.
+**WARNING** The password you create on seeding will be stored as plaintext. Please reset this password as soon as possible!
+```
 
 **up and running**
 
