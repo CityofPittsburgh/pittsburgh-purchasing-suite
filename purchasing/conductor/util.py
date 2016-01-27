@@ -202,7 +202,7 @@ def assign_a_contract(contract, flow, user, start_time=None, clone=True):
     return contract
 
 def convert_to_str(field):
-    return str(field) if field else ''
+    return str(field) if field is not None else ''
 
 def upload_costars_contract(_file):
     '''Upload a COSTARS pdf document to S3
