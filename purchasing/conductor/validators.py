@@ -79,5 +79,7 @@ def validate_date(form, field):
     '''
     if field.data:
         utc_data = current_app.config['DISPLAY_TIMEZONE'].localize(field.data).astimezone(pytz.UTC).replace(tzinfo=None)
-        if utc_data < form.started or utc_data > form.maximum:
-            raise ValidationError("Date conflicts! Replaced with today's date.")
+        if utc_data < form.started:
+            raise ValidationError('Invalid date (before step start)')
+        elif utc_data > form.maximum:
+            raise ValidationError("Invalid date (in future)")

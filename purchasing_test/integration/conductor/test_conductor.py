@@ -295,12 +295,12 @@ class TestConductor(TestConductorSetup):
         early = self.client.post(transition_url, data={
             'complete': datetime.datetime.now() - datetime.timedelta(days=1)
         }, follow_redirects=True)
-        self.assertTrue('Date conflicts! Replaced with' in early.data)
+        self.assertTrue('Invalid date (before step start)' in early.data)
 
         late = self.client.post(transition_url, data={
             'complete': datetime.datetime.now() + datetime.timedelta(days=1)
         }, follow_redirects=True)
-        self.assertTrue('Date conflicts! Replaced with' in late.data)
+        self.assertTrue('Invalid date (in future)' in late.data)
 
         contract_stages = ContractStage.query.all()
         for stage in contract_stages:
