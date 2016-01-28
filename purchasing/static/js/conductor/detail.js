@@ -54,6 +54,9 @@ $(document).ready(function() {
       $('.js-datepicker-validator').removeClass('hidden');
     }).on('dp.change', function(e) {
       $('.js-datepicker-validator').addClass('hidden');
+      if (e.date > moment($(e.target).attr('data-now'), 'YYYY-MM-DD HH:mm')) {
+        $('.js-datepicker-validator').removeClass('hidden');
+      }
     });
 
   }

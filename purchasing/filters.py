@@ -60,6 +60,13 @@ def _current_user():
 def now():
     return pytz.UTC.localize(datetime.datetime.utcnow()).astimezone(current_app.config['DISPLAY_TIMEZONE'])
 
+def end_of_today():
+    return pytz.UTC.localize(
+        datetime.datetime.utcnow()
+    ).astimezone(current_app.config['DISPLAY_TIMEZONE']).replace(
+        hour=23, minute=59, second=59
+    )
+
 def better_title(string):
     '''drop in replacement for jinja default title filter
 
