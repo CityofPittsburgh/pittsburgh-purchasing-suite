@@ -38,7 +38,7 @@ def upgrade():
     # recreate our search view
     conn.execute(sa.sql.text('''
     CREATE MATERIALIZED VIEW search_view AS (
-        SELECT
+        SELECT DISTINCT
             c.id::VARCHAR || contract_property.id::VARCHAR || line_item.id::VARCHAR || company.id::VARCHAR AS id,
             c.id AS contract_id,
             company.id AS company_id,

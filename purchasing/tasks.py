@@ -11,19 +11,20 @@ def send_email(messages):
 
 @celery.task
 def rebuild_search_view():
+    session = db.create_scoped_session()
     try:
-        session = db.create_scoped_session()
         session.execute(
             '''
             REFRESH MATERIALIZED VIEW CONCURRENTLY search_view
             '''
         )
         session.commit()
-        db.engine.dispose()
     except Exception, e:
         raise e
     finally:
         cache.delete('refresh-lock')
+        session.close()
+        db.engine.dispose()
 
 @celery.task
 def scrape_county_task(job):
