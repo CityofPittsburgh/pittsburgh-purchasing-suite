@@ -48,6 +48,7 @@ class Config(object):
     # http://pythonhosted.org/itsdangerous/#the-salt
     # for more information
     SECURITY_PASSWORD_SALT = os_env.get('SECURITY_PASSWORD_SALT', 'salty')
+    MAIL_SERVER = os_env.get('MAIL_SERVER', 'smtp.gmail.com')
 
 class ProdConfig(Config):
     """Production configuration."""
@@ -59,7 +60,6 @@ class ProdConfig(Config):
     S3_USE_HTTPS = True
     FLASK_ASSETS_USE_S3 = True
     UGLIFYJS_EXTRA_ARGS = ['-m']
-    MAIL_SERVER = 'smtp.sendgrid.net'
     MAIL_MAX_EMAILS = 100
     CELERY_BROKER_URL = os_env.get('REDIS_URL', 'redis://localhost:6379/0')
     CELERY_RESULT_BACKEND = os_env.get('REDIS_URL', 'redis://localhost:6379/0')
@@ -76,7 +76,6 @@ class DevConfig(Config):
     SQLALCHEMY_ECHO = os_env.get('SQLALCHEMY_ECHO', False)
     DEBUG_TB_ENABLED = True
     BROWSERID_URL = os_env.get('BROWSERID_URL', 'http://127.0.0.1:9000')
-    MAIL_SERVER = 'smtp.gmail.com'  # Use gmail in dev: https://support.google.com/mail/answer/1173270?hl=en
     ASSETS_DEBUG = True
     UPLOAD_S3 = False
     UPLOAD_DESTINATION = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'uploads'))
