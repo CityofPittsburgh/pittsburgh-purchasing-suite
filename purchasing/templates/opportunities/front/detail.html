@@ -29,7 +29,7 @@
           {% endif %}
         </div>
 
-        {% if opportunity.categories|length > 0 %}
+        {% if opportunity.categories|length > 0 and not current_user.is_anonymous %}
         <div class="row">
           <div class="col-md-10">
             <p class="help-block">
