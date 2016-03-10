@@ -11,6 +11,10 @@
     "jquery.dirtyforms": "~1.2.3",
     "moment": "~2.10.6",
     "respond": "~1.4.2",
-    "select2": "~4.0.0"
+    "select2": "~4.0.0",
+    "pathseg": "^1.0.2"
+  },
+  "resolutions": {
+    "d3": "<=3.5.0"
   }
 }

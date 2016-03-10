@@ -128,13 +128,13 @@ class Model(CRUDMixin, db.Model):
 @sqlalchemy.event.listens_for(Model, 'before_insert', propagate=True)
 def before_insert(mapper, connecton, instance):
     instance.created_at = datetime.datetime.utcnow()
-    instance.created_by_id = current_user.id if hasattr(current_user, 'id') and not current_user.is_anonymous() else None
+    instance.created_by_id = current_user.id if hasattr(current_user, 'id') and not current_user.is_anonymous else None
 
 @sqlalchemy.event.listens_for(Model, 'before_update', propagate=True)
 def before_update(mapper, connection, instance):
     if db.session.object_session(instance).is_modified(instance, include_collections=False):
         instance.updated_at = datetime.datetime.utcnow()
-        instance.updated_by_id = current_user.id if hasattr(current_user, 'id') and not current_user.is_anonymous() else None
+        instance.updated_by_id = current_user.id if hasattr(current_user, 'id') and not current_user.is_anonymous else None
 
 
 def refresh_search_view(mapper, connection, target):

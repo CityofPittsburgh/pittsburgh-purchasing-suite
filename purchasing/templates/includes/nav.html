@@ -33,7 +33,7 @@
                 </span>
                 Beacon
               </a></li>
-              {% if not _current_user.is_anonymous() and _current_user.is_conductor() %}
+              {% if not _current_user.is_anonymous and _current_user.is_conductor() %}
               <li><a href="{{ url_for('conductor.index') }}">
                 <span class="custom-logos">
                   <i class="fa fa-black fa-train"></i>

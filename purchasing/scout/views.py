@@ -190,10 +190,10 @@ def search():
 
     current_app.logger.info('WEXSEARCH - {search_for}: {user} searched for "{search_for}"'.format(
         search_for=search_for,
-        user=current_user.email if not current_user.is_anonymous() else 'anonymous'
+        user=current_user.email if not current_user.is_anonymous else 'anonymous'
     ))
 
-    user_follows = [] if current_user.is_anonymous() else current_user.get_following()
+    user_follows = [] if current_user.is_anonymous else current_user.get_following()
 
     return render_template(
         'scout/search.html',

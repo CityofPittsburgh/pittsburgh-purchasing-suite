@@ -69,6 +69,7 @@ conductorjs = Bundle(
     'libs/datatables/media/js/jquery.dataTables.js',
     'libs/jquery.dirtyforms/jquery.dirtyforms.js',
     'libs/select2/dist/js/select2.js',
+    'libs/pathseg/pathseg.js',
     'libs/d3/d3.js',
     'libs/c3/c3.js',
     'js/shared/*.js',
