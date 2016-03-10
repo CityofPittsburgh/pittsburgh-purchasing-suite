@@ -172,7 +172,7 @@ def register_logging(app, config_string):
             This is a filter which injects contextual information into the log.
             '''
             def filter(self, record):
-                user_id = current_user.email if not current_user.is_anonymous() else 'anonymous'
+                user_id = current_user.email if not current_user.is_anonymous else 'anonymous'
                 record.user_id = user_id
                 return True
 

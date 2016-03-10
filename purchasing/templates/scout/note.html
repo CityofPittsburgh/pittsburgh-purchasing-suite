@@ -14,7 +14,7 @@
 </div>
 {% endif %}
 
-{% if not current_user.is_anonymous() %}
+{% if not current_user.is_anonymous %}
 <form method="POST" action="{{ url_for('scout.contract', contract_id=contract.id) }}">
   {{ note_form.csrf_token() }}
 

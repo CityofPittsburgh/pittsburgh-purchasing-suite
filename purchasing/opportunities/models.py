@@ -325,7 +325,7 @@ class Opportunity(Model):
         Returns:
             Boolean indiciating if the user can view this opportunity
         '''
-        return False if user.is_anonymous() and not self.is_published else True
+        return False if user.is_anonymous and not self.is_published else True
 
     def can_edit(self, user):
         '''Check if a user can edit the contract

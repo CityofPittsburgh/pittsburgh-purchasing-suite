@@ -17,7 +17,7 @@ def requires_roles(*roles):
         @wraps(view_function)
         def decorated_function(*args, **kwargs):
 
-            if current_user.is_anonymous():
+            if current_user.is_anonymous:
                 flash('This feature is for city staff only. If you are staff, log in with your pittsburghpa.gov email using the link to the upper right.', 'alert-warning')
                 return redirect(request.args.get('next') or '/')
             elif current_user.role.name not in roles:
@@ -71,7 +71,7 @@ class AuthMixin(object):
     accepted_roles = ['admin', 'superadmin']
 
     def is_accessible(self):
-        if current_user.is_anonymous():
+        if current_user.is_anonymous:
             return False
         if current_user.role.name in self.accepted_roles:
             return True

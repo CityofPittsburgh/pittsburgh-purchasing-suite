@@ -102,7 +102,7 @@ def feedback_handler(contract, search_for=None):
     form = FeedbackForm()
     search_form = SearchForm()
 
-    if not current_user.is_anonymous():
+    if not current_user.is_anonymous:
         form.sender.data = current_user.email
 
     if form.validate_on_submit():
