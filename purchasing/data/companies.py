@@ -30,6 +30,9 @@ class Company(RefreshSearchViewMixin, Model):
         backref='companies',
     )
 
+    def __repr__(self):
+        return self.company_name
+
     def __unicode__(self):
         return self.company_name
 
