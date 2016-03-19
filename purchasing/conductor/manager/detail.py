@@ -205,7 +205,11 @@ def transition(contract_id, stage_id):
             request.args.get('destination') else None
 
         try:
-            actions = contract.transition(current_user, destination=clicked, complete_time=completed_time)
+            actions = contract.transition(
+                current_user, destination=clicked,
+                complete_time=completed_time
+            )
+
             for action in actions:
                 db.session.add(action)
             db.session.commit()

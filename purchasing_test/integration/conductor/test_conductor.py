@@ -72,11 +72,12 @@ class TestConductorSetup(BaseTestCase):
         self.detail_view = '/conductor/contract/{}/stage/{}'
         self.transition_view = '/conductor/contract/{}/stage/{}/'
 
-    def assign_contract(self, flow=None, contract=None):
+    def assign_contract(self, flow=None, contract=None, start_time=None):
         flow = flow if flow else self.flow
         contract = contract if contract else self.contract1
+        start_time = start_time if start_time else datetime.datetime.now()
 
-        assign_a_contract(contract, flow, self.conductor, start_time=datetime.datetime.now())
+        assign_a_contract(contract, flow, self.conductor, start_time=start_time)
 
         return contract.children[0]
 
@@ -281,12 +282,34 @@ class TestConductor(TestConductorSetup):
 
         contract_stages = ContractStage.query.all()
         for stage in contract_stages:
-            if stage.id == self.stage1.id:
+            if stage.stage_id == self.stage1.id:
                 self.assertTrue(stage.entered is not None and stage.exited is not None)
-            elif stage.id == self.stage2.id:
+            elif stage.stage_id == self.stage2.id:
                 self.assertTrue(stage.entered is not None and stage.exited is None)
-            elif stage.id == self.stage3.id:
+            elif stage.stage_id == self.stage3.id:
                 self.assertTrue(stage.entered is None and stage.exited is None)
+
+    def test_conductor_auto_fix_dates(self):
+        two_days_ago = datetime.datetime.now() - datetime.timedelta(days=2)
+        assign = self.assign_contract(start_time=two_days_ago)
+
+        transition_url = self.build_detail_view(assign) + '/transition'
+        self.client.post(transition_url, data={'complete': two_days_ago})
+        self.client.post(transition_url, data={'complete': two_days_ago})
+
+        revert_url = self.build_detail_view(assign) + '/transition?destination={}'
+        self.client.post(revert_url.format(self.stage2.id), data={
+            'complete': datetime.datetime.now() - datetime.timedelta(days=1)
+        })
+
+        contract_stage_1 = ContractStage.query.filter(ContractStage.stage_id == self.stage1.id).first()
+        contract_stage_2 = ContractStage.query.filter(ContractStage.stage_id == self.stage2.id).first()
+
+        self.assertNotEquals(contract_stage_1.exited, contract_stage_2.entered)
+
+        self.client.get(transition_url)
+
+        self.assertEquals(contract_stage_1.exited, contract_stage_2.entered)
 
     def test_conductor_transition_complete_date_validation(self):
         assign = self.assign_contract()

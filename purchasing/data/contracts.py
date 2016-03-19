@@ -459,6 +459,29 @@ class ContractBase(RefreshSearchViewMixin, Model):
 
         return clone
 
+    def _fix_start_time(self, stage):
+        actions = []
+        previous_stage_exit = self._get_previous_stage_exit_time(stage)
+        if previous_stage_exit is None or stage.entered == previous_stage_exit:
+            pass
+        else:
+            enter_actions = stage.contract_stage_actions.filter(
+                ContractStageActionItem.action_type.in_(['entered', 'reversion']),
+                ContractStageActionItem.action_detail['timestamp'].astext == stage.entered.strftime('%Y-%m-%dT%H:%M:%S')
+            ).all()
+            for action in enter_actions:
+                action.action_detail['timestamp'] = previous_stage_exit.strftime('%Y-%m-%dT%H:%M:%S')
+                actions.append(action)
+            stage.enter(previous_stage_exit)
+        return actions
+
+    def _get_previous_stage_exit_time(self, stage):
+        current_stage_idx = self.flow.stage_order.index(stage.stage_id)
+        previous = ContractStage.get_one(
+            self.id, self.flow.id, self.flow.stage_order[current_stage_idx - 1]
+        )
+        return previous.exited
+
     def _transition_to_first(self, user, complete_time):
         contract_stage = ContractStage.get_one(
             self.id, self.flow.id, self.flow.stage_order[0]
@@ -477,10 +500,12 @@ class ContractBase(RefreshSearchViewMixin, Model):
         )
 
         self.current_stage_id = next_stage.stage.id
-        return [
+        actions = self._fix_start_time(current_stage)
+        actions.extend([
             current_stage.log_exit(user, complete_time),
             next_stage.log_enter(user, complete_time)
-        ]
+        ])
+        return actions
 
     def _transition_to_last(self, user, complete_time):
         exit = self.current_contract_stage.log_exit(user, complete_time)
@@ -497,8 +522,9 @@ class ContractBase(RefreshSearchViewMixin, Model):
         to_revert = ContractStage.get_multiple(self.id, self.flow_id, stages)
 
         actions = []
-        for contract_stage_ix, contract_stage in enumerate(to_revert):
-            if contract_stage_ix == 0:
+
+        for ix, contract_stage in enumerate(to_revert):
+            if ix == 0:
                 actions.append(contract_stage.log_reopen(user, complete_time))
                 contract_stage.entered = complete_time
                 contract_stage.exited = None
