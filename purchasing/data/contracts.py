@@ -459,29 +459,6 @@ class ContractBase(RefreshSearchViewMixin, Model):
 
         return clone
 
-    def _fix_start_time(self, stage):
-        actions = []
-        previous_stage_exit = self._get_previous_stage_exit_time(stage)
-        if previous_stage_exit is None or stage.entered == previous_stage_exit:
-            pass
-        else:
-            enter_actions = stage.contract_stage_actions.filter(
-                ContractStageActionItem.action_type.in_(['entered', 'reversion']),
-                ContractStageActionItem.action_detail['timestamp'].astext == stage.entered.strftime('%Y-%m-%dT%H:%M:%S')
-            ).all()
-            for action in enter_actions:
-                action.action_detail['timestamp'] = previous_stage_exit.strftime('%Y-%m-%dT%H:%M:%S')
-                actions.append(action)
-            stage.enter(previous_stage_exit)
-        return actions
-
-    def _get_previous_stage_exit_time(self, stage):
-        current_stage_idx = self.flow.stage_order.index(stage.stage_id)
-        previous = ContractStage.get_one(
-            self.id, self.flow.id, self.flow.stage_order[current_stage_idx - 1]
-        )
-        return previous.exited
-
     def _transition_to_first(self, user, complete_time):
         contract_stage = ContractStage.get_one(
             self.id, self.flow.id, self.flow.stage_order[0]
@@ -500,7 +477,7 @@ class ContractBase(RefreshSearchViewMixin, Model):
         )
 
         self.current_stage_id = next_stage.stage.id
-        actions = self._fix_start_time(current_stage)
+        actions = current_stage._fix_start_time()
         actions.extend([
             current_stage.log_exit(user, complete_time),
             next_stage.log_enter(user, complete_time)

@@ -73,7 +73,7 @@ class TestContractTransition(ContractObjectTestBase):
         _get.side_effect = [ContractStage(stage=self.stage1), ContractStage(stage=self.stage2)]
         ContractStage.get_one = _get
         _fix = Mock(return_value=[])
-        contracts.ContractBase._fix_start_time = _fix
+        ContractStage._fix_start_time = _fix
 
         self.active_contract.current_stage_id = self.stage1.id
         self.active_contract.current_stage = self.stage1
