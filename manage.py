@@ -306,6 +306,30 @@ def do_work(ignore_time=False):
     refresh_search_view()
 
 @manager.command
+def fix_conductor_start_dates():
+    turn_off_sqlalchemy_events()
+    from purchasing.data import contracts as c, contract_stages as cs, flows as f
+    try:
+
+        conductor_contracts = c.ContractBase.query.join(c.ContractType).filter(
+            c.ContractType.managed_by_conductor == True
+        ).all()
+        flows = f.Flow.query.all()
+        for contract in conductor_contracts:
+            for flow in flows:
+                contract_stages = cs.ContractStage.get_multiple(
+                    contract.id, flow.id, flow.stage_order
+                )
+                for contract_stage in contract_stages:
+                    if contract_stage.entered and contract_stage.exited:
+                        actions = contract_stage._fix_start_time()
+                        for action in actions:
+                            db.session.add(action)
+                        db.session.commit()
+    finally:
+        turn_on_sqlalchemy_events()
+
+@manager.command
 def update_conductor():
     turn_off_sqlalchemy_events()
     from purchasing.data.contract_stages import ContractStage, ContractStageActionItem

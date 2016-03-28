@@ -477,10 +477,12 @@ class ContractBase(RefreshSearchViewMixin, Model):
         )
 
         self.current_stage_id = next_stage.stage.id
-        return [
+        actions = current_stage._fix_start_time()
+        actions.extend([
             current_stage.log_exit(user, complete_time),
             next_stage.log_enter(user, complete_time)
-        ]
+        ])
+        return actions
 
     def _transition_to_last(self, user, complete_time):
         exit = self.current_contract_stage.log_exit(user, complete_time)
@@ -497,8 +499,9 @@ class ContractBase(RefreshSearchViewMixin, Model):
         to_revert = ContractStage.get_multiple(self.id, self.flow_id, stages)
 
         actions = []
-        for contract_stage_ix, contract_stage in enumerate(to_revert):
-            if contract_stage_ix == 0:
+
+        for ix, contract_stage in enumerate(to_revert):
+            if ix == 0:
                 actions.append(contract_stage.log_reopen(user, complete_time))
                 contract_stage.entered = complete_time
                 contract_stage.exited = None

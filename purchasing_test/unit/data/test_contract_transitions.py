@@ -72,6 +72,8 @@ class TestContractTransition(ContractObjectTestBase):
         _get = Mock()
         _get.side_effect = [ContractStage(stage=self.stage1), ContractStage(stage=self.stage2)]
         ContractStage.get_one = _get
+        _fix = Mock(return_value=[])
+        ContractStage._fix_start_time = _fix
 
         self.active_contract.current_stage_id = self.stage1.id
         self.active_contract.current_stage = self.stage1
@@ -79,6 +81,7 @@ class TestContractTransition(ContractObjectTestBase):
         action = self.active_contract.transition(self.user)
         self.assertEquals(len(action), 2)
         self.assertTrue(_get.called)
+        self.assertTrue(_fix.called_once)
         self.assertEquals(action[0].action_type, 'exited')
         self.assertEquals(action[0].action_detail['stage_name'], self.stage1.name)
         self.assertEquals(action[1].action_type, 'entered')
@@ -113,4 +116,3 @@ class TestContractTransition(ContractObjectTestBase):
         self.assertEquals(action[0].action_type, 'reversion')
         self.assertTrue(_get.called_once)
         self.assertEquals(self.active_contract.current_stage_id, self.stage1.id)
-

@@ -114,6 +114,29 @@ class ContractStage(Model):
             cls.flow_id == flow_id
         ).order_by(cls.id).all()
 
+    def _fix_start_time(self):
+        actions = []
+        previous_stage_exit = self._get_previous_stage_exit_time()
+        if previous_stage_exit is None or self.entered == previous_stage_exit:
+            pass
+        else:
+            enter_actions = self.contract_stage_actions.filter(
+                ContractStageActionItem.action_type.in_(['entered', 'reversion']),
+                ContractStageActionItem.action_detail['timestamp'].astext == self.entered.strftime('%Y-%m-%dT%H:%M:%S')
+            ).all()
+            for action in enter_actions:
+                action.action_detail['timestamp'] = previous_stage_exit.strftime('%Y-%m-%dT%H:%M:%S')
+                actions.append(action)
+            self.enter(previous_stage_exit)
+        return actions
+
+    def _get_previous_stage_exit_time(self):
+        current_stage_idx = self.contract.flow.stage_order.index(self.stage_id)
+        previous = ContractStage.get_one(
+            self.contract.id, self.flow.id, self.flow.stage_order[current_stage_idx - 1]
+        )
+        return previous.exited
+
     def enter(self, enter_time=None):
         '''Set the contract stage's enter time
 
