@@ -14,7 +14,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import widgets, fields, Form as NoCSRFForm
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.validators import (
-    DataRequired, Email, ValidationError, Optional
+    DataRequired, Email, ValidationError, Optional, Length
 )
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
@@ -240,8 +240,8 @@ class VendorSignupForm(CategoryForm):
     email = fields.TextField(validators=[DataRequired(), Email()])
     first_name = fields.TextField()
     last_name = fields.TextField()
-    phone_number = fields.TextField(validators=[validate_phone_number])
-    fax_number = fields.TextField(validators=[validate_phone_number])
+    phone_number = fields.TextField(validators=[validate_phone_number, Length(max=20)])
+    fax_number = fields.TextField(validators=[validate_phone_number, Length(max=20)])
     woman_owned = fields.BooleanField('Woman-owned business')
     minority_owned = fields.BooleanField('Minority-owned business')
     veteran_owned = fields.BooleanField('Veteran-owned business')
