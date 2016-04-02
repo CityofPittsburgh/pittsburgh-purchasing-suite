@@ -11,8 +11,8 @@ class TestConductorMetrics(TestConductorSetup):
 
     def setUp(self):
         super(TestConductorMetrics, self).setUp()
-        self.assign_contract()
 
+        self.assign_contract()
         transition_url_1 = self.build_detail_view(self.contract1) + '/transition'
 
         self.assign_contract(contract=self.contract2)
@@ -100,3 +100,20 @@ class TestConductorMetrics(TestConductorSetup):
         self.assertEquals(len(data.json['complete']), 2)
         self.assertEquals(len(data.json['current']), 0)
 
+    def test_metrics_data_archived(self):
+        assign = self.assign_contract(contract=self.contract3)
+        transition_url = self.build_detail_view(assign) + '/transition'
+        self.client.get(transition_url)
+
+        data = self.client.get('/conductor/metrics/overview/{}/data'.format(self.flow.id))
+        self.assert200(data)
+        self.assertEquals(len(data.json['complete']), 3)
+        self.assertEquals(len(data.json['current']), 1)
+
+        assign.update(is_archived=True, flow=self.flow, has_metrics=True)
+        db.session.commit()
+
+        data = self.client.get('/conductor/metrics/overview/{}/data'.format(self.flow.id))
+        self.assert200(data)
+        self.assertEquals(len(data.json['complete']), 3)
+        self.assertEquals(len(data.json['current']), 0)

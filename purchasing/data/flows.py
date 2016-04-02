@@ -171,7 +171,9 @@ class Flow(Model):
 
         for ix, row in enumerate(raw_data):
             exited = row.exited if row.exited else datetime.datetime.utcnow()
-            if row.exited is None:
+            if row.exited is None and row.is_archived:
+                pass
+            elif row.exited is None:
                 results['current'] = self._build_row(row, exited, results['current'])
             else:
                 results['complete'] = self._build_row(row, exited, results['complete'])
@@ -240,13 +242,14 @@ class Flow(Model):
             select
                 x.contract_id, x.description, x.department,
                 x.email, x.stage_name, x.rn, x.stage_id,
+                x.is_archived,
                 min(x.entered) as entered,
                 max(x.exited) as exited
 
             from (
 
                 select
-                    c.id as contract_id, c.description, d.name as department,
+                    c.id as contract_id, c.description, d.name as department, c.is_archived,
                     u.email, s.name as stage_name, s.id as stage_id, cs.exited, cs.entered,
                     row_number() over (partition by c.id order by cs.entered asc, cs.id asc) as rn
 
@@ -263,7 +266,7 @@ class Flow(Model):
                 and c.has_metrics is true
 
             ) x
-            group by 1,2,3,4,5,6,7
+            group by 1,2,3,4,5,6,7,8
             order by contract_id, rn asc
         ''', {
             'flow_id': self.id
