@@ -1,4 +1,19 @@
 {% extends 'admin/model/list.html' %}
 
-{% block head %}
+{% block tail %}
+  <script>
+    $(document).ready(function() {
+      var tenYears = new Date(
+        new Date().setFullYear(new Date().getFullYear() + 10)
+      ).getFullYear().toString()
+
+      var comboBoxes = $('td a').filter(function() {
+        return $(this).attr('data-type') === 'combodate'
+      });
+      comboBoxes.attr(
+        'data-combodate', '{"minYear": "1990", "maxYear": ' + tenYears + '}'
+      )
+    });
+  </script>
+  {{ super() }}
 {% endblock %}

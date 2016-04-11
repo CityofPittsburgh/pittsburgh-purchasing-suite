@@ -52,7 +52,7 @@ class ContractBaseAdmin(AuthMixin, BaseModelViewAdmin):
     create_template = 'admin/purchasing_create.html'
 
     column_searchable_list = (
-        ContractBase.description, ContractProperty.value, Company.company_name
+        ContractBase.description, ContractProperty.value, 'companies.company_name'
     )
 
     column_list = [
@@ -71,12 +71,6 @@ class ContractBaseAdmin(AuthMixin, BaseModelViewAdmin):
             'validators': [validate_integer]
         },
     }
-
-    def init_search(self):
-        r = super(ContractBaseAdmin, self).init_search()
-        self._search_joins.append(company_contract_association_table)
-        self._search_joins.reverse()
-        return r
 
     def scaffold_filters(self, name):
         filters = super(ContractBaseAdmin, self).scaffold_filters(name)
