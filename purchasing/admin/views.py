@@ -390,7 +390,7 @@ class CategoryAdmin(AuthMixin, BaseModelViewAdmin):
 
     form_extra_fields = {
         'category': QuerySelectField(
-            'Stage Order',
+            'Category Group',
             query_factory=Category.parent_category_query_factory,
             get_pk=lambda i: i.category,
             get_label=lambda i: i.category,

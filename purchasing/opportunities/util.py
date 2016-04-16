@@ -172,11 +172,11 @@ def signup_for_opp(form, opportunity, multi=False):
     db.session.commit()
 
     current_app.logger.info(
-        'OPPSIGNUP - Vendor has signed up for opportunities: EMAIL: {email} at BUSINESS: {bis_name} signed up for:\n' +
-        'OPPORTUNITY: {opportunities}'.format(
+        u'OPPSIGNUP - Vendor has signed up for opportunities: EMAIL: {email} at BUSINESS: {bis_name} signed up for:\n' +
+        u'OPPORTUNITY: {opportunities}'.format(
             email=form.data.get('email'),
             business_name=form.data.get('business_name'),
-            opportunities=', '.join([i.title.encode('ascii', 'ignore') for i in email_opportunities])
+            opportunities=', '.join([i.title for i in email_opportunities])
         )
     )
 

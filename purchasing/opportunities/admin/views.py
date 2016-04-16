@@ -160,8 +160,8 @@ def publish(opportunity_id):
         ).send(multi=True)
 
         current_app.logger.info(
-'''BEACON APPROVED: ID: {} | Title: {} | Publish Date: {} | Submission Start Date: {} | Submission End Date: {} '''.format(
-                opportunity.id, opportunity.title.encode('ascii', 'ignore'), str(opportunity.planned_publish),
+u'''BEACON APPROVED: ID: {} | Title: {} | Publish Date: {} | Submission Start Date: {} | Submission End Date: {} '''.format(
+                opportunity.id, opportunity.title, str(opportunity.planned_publish),
                 str(opportunity.planned_submission_start), str(opportunity.planned_submission_end)
             )
         )
@@ -215,8 +215,8 @@ def archive(opportunity_id):
         db.session.commit()
 
         current_app.logger.info(
-'''BEACON ARCHIVED: ID: {} | Title: {} | Publish Date: {} | Submission Start Date: {} | Submission End Date: {} '''.format(
-                opportunity.id, opportunity.title.encode('ascii', 'ignore'), str(opportunity.planned_publish),
+u'''BEACON ARCHIVED: ID: {} | Title: {} | Publish Date: {} | Submission Start Date: {} | Submission End Date: {} '''.format(
+                opportunity.id, opportunity.title, str(opportunity.planned_publish),
                 str(opportunity.planned_submission_start), str(opportunity.planned_submission_end)
             )
         )
