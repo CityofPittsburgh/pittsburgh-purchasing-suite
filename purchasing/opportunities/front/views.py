@@ -170,14 +170,14 @@ def manage():
                 vendor.subscribed_to_newsletter = False
 
             current_app.logger.info(
-                '''OPPMANAGEVIEW - Vendor {} unsubscribed from:
+                u'''OPPMANAGEVIEW - Vendor {} unsubscribed from:
                 Categories: {}
                 Opportunities: {}
                 Subscribed from newsletter: {}
                 '''.format(
                     email,
-                    ', '.join([i.category_friendly_name for i in remove_categories if remove_categories and len(remove_categories) > 0]),
-                    ', '.join([i.description for i in remove_opportunities if remove_opportunities and len(remove_opportunities) > 0]),
+                    u', '.join([i.category_friendly_name for i in remove_categories if remove_categories and len(remove_categories) > 0]),
+                    u', '.join([i.description for i in remove_opportunities if remove_opportunities and len(remove_opportunities) > 0]),
                     vendor.subscribed_to_newsletter
                 )
             )
@@ -271,8 +271,8 @@ def detail(opportunity_id):
                 flash('Successfully subscribed for updates!', 'alert-success')
                 return redirect(url_for('opportunities.detail', opportunity_id=opportunity.id))
 
-        current_app.logger.info('BEACON FRONT OPPORTUNITY DETAIL VIEW | Opportunity {} (ID: {})'.format(
-            opportunity.title.encode('ascii', 'ignore'), opportunity.id
+        current_app.logger.info(u'BEACON FRONT OPPORTUNITY DETAIL VIEW | Opportunity {} (ID: {})'.format(
+            opportunity.title, opportunity.id
         ))
 
         return render_template(

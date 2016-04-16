@@ -67,7 +67,7 @@ class Category(Model):
     examples_tsv = Column(TSVECTOR)
 
     def __unicode__(self):
-        return '{sub} (in {main})'.format(sub=self.category_friendly_name, main=self.category)
+        return u'{sub} (in {main})'.format(sub=self.category_friendly_name, main=self.category)
 
     @classmethod
     def parent_category_query_factory(cls):
@@ -192,10 +192,10 @@ class Opportunity(Model):
         opportunity = Opportunity(**data)
 
         current_app.logger.info(
-'''BEACON NEW - New Opportunity Created: Department: {} | Title: {} | Publish Date: {} | Submission Start Date: {} | Submission End Date: {}
+u'''BEACON NEW - New Opportunity Created: Department: {} | Title: {} | Publish Date: {} | Submission Start Date: {} | Submission End Date: {}
             '''.format(
                 opportunity.id, opportunity.department.name if opportunity.department else '',
-                opportunity.title.encode('ascii', 'ignore'),
+                opportunity.title,
                 str(opportunity.planned_publish),
                 str(opportunity.planned_submission_start), str(opportunity.planned_submission_end)
             )
@@ -241,9 +241,9 @@ class Opportunity(Model):
             setattr(self, attr, value)
 
         current_app.logger.info(
-'''BEACON Update - Opportunity Updated: ID: {} | Title: {} | Publish Date: {} | Submission Start Date: {} | Submission End Date: {}
+u'''BEACON Update - Opportunity Updated: ID: {} | Title: {} | Publish Date: {} | Submission Start Date: {} | Submission End Date: {}
             '''.format(
-                self.id, self.title.encode('ascii', 'ignore'), str(self.planned_publish),
+                self.id, self.title, str(self.planned_publish),
                 str(self.planned_submission_start), str(self.planned_submission_end)
             )
         )
@@ -480,9 +480,9 @@ class Opportunity(Model):
             self.published_at = datetime.datetime.utcnow()
 
             current_app.logger.info(
-'''BEACON PUBLISHED:  ID: {} | Title: {} | Publish Date: {} | Submission Start Date: {} | Submission End Date: {}
+u'''BEACON PUBLISHED:  ID: {} | Title: {} | Publish Date: {} | Submission Start Date: {} | Submission End Date: {}
                 '''.format(
-                    self.id, self.title.encode('ascii', 'ignore'), str(self.planned_publish),
+                    self.id, self.title, str(self.planned_publish),
                     str(self.planned_submission_start), str(self.planned_submission_end)
                 )
             )
