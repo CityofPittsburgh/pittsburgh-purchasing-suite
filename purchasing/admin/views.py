@@ -50,6 +50,7 @@ class ContractBaseAdmin(AuthMixin, BaseModelViewAdmin):
     '''
     edit_template = 'admin/purchasing_edit.html'
     create_template = 'admin/purchasing_create.html'
+    list_template = 'admin/purchasing_list.html'
 
     column_searchable_list = (
         ContractBase.description, ContractProperty.value, 'companies.company_name'
