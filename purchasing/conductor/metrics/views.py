@@ -81,35 +81,40 @@ def download_all():
     results = db.session.execute('''
     SELECT * FROM (
     SELECT
-        c.id as item_number, null as parent_item_number,
+        c.id as item_number, NULL as parent_item_number,
         c.description, c.expiration_date, null as parent_expiration,
         d.name as department, u.email as assigned_to,
         cp.value as spec_number, null as parent_spec,
         f.flow_name as flow_name, c.has_metrics as visible_in_metrics,
         CASE
-            WHEN c.id in (select parent_id from contract where parent_id is not NULL) AND c.is_archived is True then 'completed'
+            WHEN cl.id IS NOT NULL AND c.is_archived is True then 'completed'
             WHEN c.is_archived is True THEN 'archived'
+            WHEN cl.id IS NOT NULL THEN CASE
+                WHEN cl.current_stage_id = (SELECT cl.stage_order[array_upper(cl.stage_order, 1)])
+                THEN 'child contract complete'
+                ELSE 'child contract in progress'
+            END
             WHEN c.is_visible is False and c.current_stage_id is NULL THEN 'removed from conductor'
-            WHEN c.current_stage_id is NULL THEN 'not started'
+            WHEN c.current_stage_id is NULL AND cl.id IS NULL THEN 'not started, in all contracts list'
+            WHEN c.current_stage_id IS NOT NULL
+                AND c.current_stage_id = (SELECT f.stage_order[array_upper(f.stage_order, 1)])
+                THEN 'complete, in all contracts list'
             WHEN c.current_stage_id is NOT NULL THEN 'started'
         END as status
     FROM contract c
-    LEFT OUTER JOIN contract_property cp
-    ON c.id = cp.contract_id
-    LEFT OUTER JOIN users u
-    ON c.assigned_to = u.id
-    LEFT OUTER JOIN department d
-    ON c.department_id = d.id
-    LEFT OUTER JOIN contract_type ct
-    ON c.contract_type_id = ct.id
-    LEFT OUTER JOIN flow f
-    on c.flow_id = f.id
-    WHERE lower(ct.name) in ('county', 'a-bid', 'b-bid')
+    LEFT OUTER JOIN (
+        SELECT contract.*, flow.stage_order
+        FROM contract JOIN flow ON contract.flow_id = flow.id
+    ) cl ON cl.parent_id = c.id
+    LEFT OUTER JOIN contract_property cp ON c.id = cp.contract_id
+    LEFT OUTER JOIN users u ON c.assigned_to = u.id
+    LEFT OUTER JOIN department d ON c.department_id = d.id
+    LEFT OUTER JOIN contract_type ct ON c.contract_type_id = ct.id
+    LEFT OUTER JOIN flow f on c.flow_id = f.id
+    WHERE ct.managed_by_conductor = true
     AND lower(cp.key) = 'spec number'
     AND c.parent_id is null
-
     UNION ALL
-
     SELECT
         c.id as item_number, p.id as parent_item_number,
         c.description, c.expiration_date, p.expiration_date as parent_expiration,
@@ -119,29 +124,26 @@ def download_all():
         CASE
             WHEN c.id in (select parent_id from contract where parent_id is not NULL) AND c.is_archived is True then 'completed'
             WHEN c.is_archived is True THEN 'archived'
+            WHEN c.current_stage_id IS NOT NULL
+                AND c.current_stage_id = (SELECT f.stage_order[array_upper(stage_order, 1)])
+                AND c.id NOT IN (select parent_id from contract where parent_id IS NOT NULL)
+                AND c.expiration_date IS NOT NULL
+                THEN 'complete, in all contracts list'
             WHEN c.is_visible is False and c.current_stage_id is NULL THEN 'removed from conductor'
-            WHEN c.current_stage_id is NULL then 'not started'
+            WHEN c.current_stage_id is NULL then 'not started, in all contracts list'
             WHEN c.current_stage_id is NOT NULL then 'started'
         END as status
     FROM contract c
-    INNER JOIN contract p
-    ON c.parent_id = p.id
-    LEFT OUTER JOIN contract_property cp
-    ON c.id = cp.contract_id
-    LEFT OUTER JOIN contract_property pcp
-    ON c.parent_id = pcp.contract_id
-    LEFT OUTER JOIN users u
-    ON c.assigned_to = u.id
-    LEFT OUTER JOIN department d
-    ON c.department_id = d.id
-    LEFT OUTER JOIN contract_type ct
-    ON c.contract_type_id = ct.id
-    LEFT OUTER JOIN flow f
-    on c.flow_id = f.id
-    WHERE lower(ct.name) in ('county', 'a-bid', 'b-bid')
+    INNER JOIN contract p ON c.parent_id = p.id
+    LEFT OUTER JOIN contract_property cp ON c.id = cp.contract_id
+    LEFT OUTER JOIN contract_property pcp ON c.parent_id = pcp.contract_id
+    LEFT OUTER JOIN users u ON c.assigned_to = u.id
+    LEFT OUTER JOIN department d ON c.department_id = d.id
+    LEFT OUTER JOIN contract_type ct ON c.contract_type_id = ct.id
+    LEFT OUTER JOIN flow f on c.flow_id = f.id
+    WHERE ct.managed_by_conductor = true
     AND (lower(cp.key) = 'spec number' OR lower(pcp.key) = 'spec number')
     AND c.parent_id is not null
-
     ) x
     ORDER BY 1
     ''').fetchall()
