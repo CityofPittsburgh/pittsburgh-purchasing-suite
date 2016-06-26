@@ -88,7 +88,8 @@ class TestConductorMetrics(TestConductorSetup):
         self.assertEquals(status['archived'], 1)
         self.assertEquals(status['completed'], 1)
         self.assertEquals(status['started'], 2)
-        self.assertEquals(status['not started'], 3)
+        self.assertEquals(status['not started, in all contracts list'], 2)
+        self.assertEquals(status['child contract complete'], 1)
         self.assertEquals(status['removed from conductor'], 1)
 
         self.assertEquals(in_metrics['True'], 7)
