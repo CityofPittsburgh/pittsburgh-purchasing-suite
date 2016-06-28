@@ -239,35 +239,38 @@ class Flow(Model):
         '''Raw SQL query that returns the raw data to be reshaped for download or charting
         '''
         return db.session.execute('''
+        select
+            x.contract_id, x.description, x.department,
+            x.email, x.stage_name, x.rn, x.stage_id,
+            x.is_archived,
+            min(x.entered) as entered,
+            max(x.exited) as exited
+
+        from (
+
             select
-                x.contract_id, x.description, x.department,
-                x.email, x.stage_name, x.rn, x.stage_id,
-                x.is_archived,
-                min(x.entered) as entered,
-                max(x.exited) as exited
+                c.id as contract_id, c.description, d.name as department, c.is_archived,
+                u.email, s.name as stage_name, s.id as stage_id, cs.exited, cs.entered,
+                row_number() over (partition by c.id order by cs.entered asc, cs.id asc) as rn,
+                f.stage_order[s.id] as pos
 
-            from (
+            from contract_stage cs
+            join stage s on cs.stage_id = s.id
 
-                select
-                    c.id as contract_id, c.description, d.name as department, c.is_archived,
-                    u.email, s.name as stage_name, s.id as stage_id, cs.exited, cs.entered,
-                    row_number() over (partition by c.id order by cs.entered asc, cs.id asc) as rn
+            join contract c on cs.contract_id = c.id
 
-                from contract_stage cs
-                join stage s on cs.stage_id = s.id
+            join users u on c.assigned_to = u.id
+            left join department d on c.department_id = d.id
 
-                join contract c on cs.contract_id = c.id
+            join flow f on cs.flow_id = f.id
 
-                join users u on c.assigned_to = u.id
-                left join department d on c.department_id = d.id
+            where cs.entered is not null
+            and cs.flow_id = :flow_id
+            and c.has_metrics is true
 
-                where cs.entered is not null
-                and cs.flow_id = :flow_id
-                and c.has_metrics is true
-
-            ) x
-            group by 1,2,3,4,5,6,7,8
-            order by contract_id, rn asc
+        ) x
+        group by 1,2,3,4,5,6,7,8, pos
+        order by contract_id, pos, rn asc
         ''', {
             'flow_id': self.id
         }).fetchall()
