@@ -88,7 +88,7 @@ class ScoutContractAdmin(ContractBaseAdmin):
     )
 
     column_editable_list = [
-        'description', 'expiration_date', 'financial_id'
+        'description', 'expiration_date', 'financial_id', 'is_archived'
     ]
 
     form_columns = [
@@ -105,7 +105,8 @@ class ScoutContractAdmin(ContractBaseAdmin):
     column_labels = dict(
         contract_href='Link to Contract PDF', financial_id='Controller #',
         properties='Contract Properties', expiration_date='Expiration', is_archived='Archived',
-        is_visible='Visible in Conductor', has_metrics='Appears in Metrics'
+        is_visible='Visible in Conductor ALL CONTRACTS LIST',
+        has_metrics='Appears in Metrics'
     )
 
     def get_query(self):
@@ -117,16 +118,26 @@ class ScoutContractAdmin(ContractBaseAdmin):
         ).subquery()
 
         return super(ScoutContractAdmin, self).get_query().outerjoin(
-            last_stage
+            last_stage,
+        ).outerjoin(
+            ContractStage, db.and_(
+                ContractBase.current_stage_id == ContractStage.stage_id,
+                ContractBase.id == ContractStage.contract_id,
+                ContractBase.flow_id == ContractStage.flow_id
+            )
         ).filter(
             db.or_(
                 ContractBase.current_stage_id == None,
-                ContractBase.current_stage_id == last_stage.c.last
+                ContractBase.is_archived == True,
+                db.and_(
+                    ContractBase.current_stage_id == last_stage.c.last,
+                    ContractStage.exited != None
+                )
             )
         )
 
     def get_count_query(self):
-        '''Override default get count query to conform to above
+        '''Override default get query to limit to assigned contracts
         '''
         last_stage = db.session.query(
             Flow.id,
@@ -134,11 +145,21 @@ class ScoutContractAdmin(ContractBaseAdmin):
         ).subquery()
 
         return super(ScoutContractAdmin, self).get_count_query().outerjoin(
-            last_stage
+            last_stage,
+        ).outerjoin(
+            ContractStage, db.and_(
+                ContractBase.current_stage_id == ContractStage.stage_id,
+                ContractBase.id == ContractStage.contract_id,
+                ContractBase.flow_id == ContractStage.flow_id
+            )
         ).filter(
             db.or_(
                 ContractBase.current_stage_id == None,
-                ContractBase.current_stage_id == last_stage.c.last
+                ContractBase.is_archived == True,
+                db.and_(
+                    ContractBase.current_stage_id == last_stage.c.last,
+                    ContractStage.exited != None
+                )
             )
         )
 
@@ -202,11 +223,21 @@ class ConductorContractAdmin(ContractBaseAdmin):
 
         return super(ConductorContractAdmin, self).get_query().outerjoin(
             last_stage
+        ).outerjoin(
+            ContractStage, db.and_(
+                ContractBase.current_stage_id == ContractStage.stage_id,
+                ContractBase.id == ContractStage.contract_id,
+                ContractBase.flow_id == ContractStage.flow_id
+            )
         ).filter(
             db.or_(
+                db.and_(
+                    ContractBase.current_stage_id == last_stage.c.last,
+                    ContractStage.exited != None
+                ),
                 ContractBase.current_stage_id != last_stage.c.last,
                 ContractBase.current_stage_id != None
-            ), ContractBase.is_visible == False
+            )
         )
 
     def get_count_query(self):
@@ -219,11 +250,21 @@ class ConductorContractAdmin(ContractBaseAdmin):
 
         return super(ConductorContractAdmin, self).get_count_query().outerjoin(
             last_stage
+        ).outerjoin(
+            ContractStage, db.and_(
+                ContractBase.current_stage_id == ContractStage.stage_id,
+                ContractBase.id == ContractStage.contract_id,
+                ContractBase.flow_id == ContractStage.flow_id
+            )
         ).filter(
             db.or_(
+                db.and_(
+                    ContractBase.current_stage_id == last_stage.c.last,
+                    ContractStage.exited != None
+                ),
                 ContractBase.current_stage_id != last_stage.c.last,
                 ContractBase.current_stage_id != None
-            ), ContractBase.is_visible == False
+            )
         )
 
     def create_form(self):
