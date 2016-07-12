@@ -44,6 +44,7 @@
         <div class="form-inline">
         {{ macros.with_errors(form.start, **{
           'class': 'datetimepicker form-control',
+          'data-maximum': _end_of_today(),
         } )}}
 
         <button type="submit" class="btn btn-success js-transition">Start</button>
@@ -63,7 +64,7 @@
 
     e.datetimepicker({
       format: 'YYYY-MM-DD h:mma',
-      maxDate: moment(e.val()).toDate(),
+      maxDate: moment(e.attr('data-maximum'), 'YYYY-MM-DD HH:mm').format('YYYY-MM-DD HH:mm'),
       keepInvalid: true,
       defaultDate: moment(e.val()).toDate(),
       widgetPositioning: {
