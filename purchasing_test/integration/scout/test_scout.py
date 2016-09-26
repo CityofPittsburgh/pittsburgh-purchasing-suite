@@ -75,7 +75,7 @@ class TestScout(BaseTestCase):
         # test that you can't subscribe to a contract unless you are signed in
         request = self.client.get('/scout/contracts/{}/subscribe'.format(self.contract1.id))
         self.assertEquals(request.status_code, 302)
-        self.assert_flashes('You do not have sufficent permissions to do that! If you are staff, make sure you are logged in using the link to the upper right.', 'alert-warning')
+        self.assert_flashes('You do not have sufficent permissions to do that! If you are city staff, make sure you are logged in using the link to the upper right.', 'alert-warning')
 
         self.login_user(self.admin_user)
         request = self.client.get('/scout/contracts/{}/subscribe'.format(self.contract1.id))
@@ -96,7 +96,7 @@ class TestScout(BaseTestCase):
         # test that you can't subscribe to a contract unless you are signed in
         request = self.client.get('/scout/contracts/{}/unsubscribe'.format(self.contract1.id))
         self.assertEquals(request.status_code, 302)
-        self.assert_flashes('You do not have sufficent permissions to do that! If you are staff, make sure you are logged in using the link to the upper right.', 'alert-warning')
+        self.assert_flashes('You do not have sufficent permissions to do that! If you are city staff, make sure you are logged in using the link to the upper right.', 'alert-warning')
 
         # two followers
         self.login_user(self.admin_user)

@@ -110,7 +110,7 @@ def register_extensions(app):
         send_email([msg])
 
     app.config['SECURITY_MSG_UNAUTHORIZED'] = (
-        'You do not have sufficent permissions to do that! If you are staff, make sure you are logged in using the link to the upper right.',
+        'You do not have sufficent permissions to do that! If you are city staff, make sure you are logged in using the link to the upper right.',
         'alert-warning',
     )
 
