@@ -11,14 +11,14 @@ from werkzeug import secure_filename
 from purchasing.database import db
 from purchasing.data.contracts import ContractBase, ContractType
 from purchasing.data.importer.costars import main as import_costars
-from purchasing.decorators import requires_roles
+from flask_security.decorators import roles_accepted
 from purchasing.conductor.forms import FileUploadForm, ContractUploadForm
 from purchasing.conductor.util import upload_costars_contract
 
 from purchasing.conductor.upload import blueprint
 
 @blueprint.route('/costars', methods=['GET', 'POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def upload_costars():
     '''Uploads a new csv file with properly-formatted COSTARS data
 
@@ -50,7 +50,7 @@ def upload_costars():
         return render_template('conductor/upload/upload_new.html', form=form)
 
 @blueprint.route('/costars/processing')
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def process():
     '''Push the filepath and filename into the template to do the upload via ajax
 
@@ -64,7 +64,7 @@ def process():
     )
 
 @blueprint.route('/costars/_process', methods=['POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def process_costars_upload():
     '''Perform the costars upload on the saved file
 
@@ -90,7 +90,7 @@ def process_costars_upload():
         return jsonify({'status': 'error: {}'.format(e)}), 500
 
 @blueprint.route('/costars/contracts', methods=['GET', 'POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def costars_contract_upload():
     '''Upload a contract document pdf for costars
 

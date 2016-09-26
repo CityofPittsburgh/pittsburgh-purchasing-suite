@@ -1,0 +1,5 @@
+Hello,
+
+We got a request to change your password for the Pittsburgh Purchasing Suite. Please click the link below to change your password.
+
+{{ reset_link }}

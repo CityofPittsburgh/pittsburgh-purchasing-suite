@@ -1,18 +1,27 @@
 # -*- coding: utf-8 -*-
-from flask.ext.login import UserMixin, AnonymousUserMixin
+from flask.ext.login import AnonymousUserMixin
+from flask.ext.security import UserMixin, RoleMixin
 
 from purchasing.database import Column, db, Model, ReferenceCol, SurrogatePK
 from sqlalchemy.orm import backref
 
-class Role(SurrogatePK, Model):
+roles_users = db.Table(
+    'roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('roles.id'))
+)
+
+class Role(SurrogatePK, RoleMixin, Model):
     '''Model to handle view-based permissions
 
     Attributes:
         id: primary key
         name: role name
+        description: description of an individual role
     '''
     __tablename__ = 'roles'
     name = Column(db.String(80), unique=True, nullable=False)
+    description = Column(db.String(255), nullable=True)
 
     def __repr__(self):
         return '<Role({name})>'.format(name=self.name)
@@ -38,6 +47,15 @@ class Role(SurrogatePK, Model):
         '''
         return cls.query.filter(cls.name != 'superadmin')
 
+    @classmethod
+    def staff_factory(cls):
+        '''Factory to return the staff role
+
+        Returns:
+            Role object with the name 'staff'
+        '''
+        return cls.query.filter(cls.name == 'staff')
+
 class User(UserMixin, SurrogatePK, Model):
     '''User model
 
@@ -47,8 +65,7 @@ class User(UserMixin, SurrogatePK, Model):
         first_name: first name of user
         last_name: last name of user
         active: whether user is currently active or not
-        role_id: foreign key of user's role
-        role: relationship of user to role table
+        roles: relationship of user to role table
         department_id: foreign key of user's department
         department: relationship of user to department table
     '''
@@ -59,10 +76,9 @@ class User(UserMixin, SurrogatePK, Model):
     last_name = Column(db.String(30), nullable=True)
     active = Column(db.Boolean(), default=True)
 
-    role_id = ReferenceCol('roles', ondelete='SET NULL', nullable=True)
-    role = db.relationship(
-        'Role', backref=backref('users', lazy='dynamic'),
-        foreign_keys=role_id, primaryjoin='User.role_id==Role.id'
+    roles = db.relationship(
+        'Role', secondary=roles_users,
+        backref=backref('users', lazy='dynamic'),
     )
 
     department_id = ReferenceCol('department', ondelete='SET NULL', nullable=True)
@@ -71,11 +87,26 @@ class User(UserMixin, SurrogatePK, Model):
         foreign_keys=department_id, primaryjoin='User.department_id==Department.id'
     )
 
+    password = db.Column(db.String(255))
+
+    confirmed_at = db.Column(db.DateTime)
+    last_login_at = db.Column(db.DateTime)
+    current_login_at = db.Column(db.DateTime)
+    last_login_ip = db.Column(db.String(255))
+    current_login_ip = db.Column(db.String(255))
+    login_count = db.Column(db.Integer)
+
     def __repr__(self):
         return '<User({email!r})>'.format(email=self.email)
 
     def __unicode__(self):
         return self.email
+
+    @property
+    def role(self):
+        if len(self.roles) > 0:
+            return self.roles[0]
+        return Role(name='')
 
     @property
     def full_name(self):
@@ -95,10 +126,8 @@ class User(UserMixin, SurrogatePK, Model):
 
     @classmethod
     def county_purchaser_factory(cls):
-        return cls.query.join(
-            Role, User.role_id == Role.id
-        ).filter(
-            Role.name == 'county'
+        return cls.query.filter(
+            User.roles.any(Role.name == 'county')
         )
 
     @classmethod
@@ -132,7 +161,21 @@ class User(UserMixin, SurrogatePK, Model):
             True if user's role is either conductor, admin, or superadmin,
             False otherwise
         '''
-        return self.role.name in ('conductor', 'admin', 'superadmin')
+        return any([
+            self.has_role('conductor'),
+            self.has_role('admin'),
+            self.has_role('superadmin')
+        ])
+
+    def is_admin(self):
+        '''Check if user can access admin applications
+
+        Returns:
+            True if user's role is admin or superadmin, False otherwise
+        '''
+        return any([
+            self.has_role('admin'), self.has_role('superadmin')
+        ])
 
     def print_pretty_name(self):
         '''Generate long version text representation of user
@@ -222,7 +265,8 @@ class AnonymousUser(AnonymousUserMixin):
     '''Custom mixin for handling anonymous (non-logged-in) users
 
     Attributes:
-        role: :py:class:`~purchasing.user.models.Role`
+        roles: List of a single
+            :py:class:`~purchasing.user.models.Role`
             object with name set to 'anonymous'
         department: :py:class:`~purchasing.user.models.Department`
             object with name set to 'anonymous'
@@ -234,9 +278,15 @@ class AnonymousUser(AnonymousUserMixin):
         which contains a number of class and instance methods around
         determining if users are currently logged in.
     '''
-    role = Role(name='anonymous')
+    roles = [Role(name='anonymous')]
     department = Department(name='anonymous')
     id = -1
 
     def __init__(self, *args, **kwargs):
         super(AnonymousUser, self).__init__(*args, **kwargs)
+
+    def is_conductor(self):
+        return False
+
+    def is_admin(self):
+        return False

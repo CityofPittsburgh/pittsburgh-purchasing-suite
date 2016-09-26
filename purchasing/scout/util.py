@@ -12,7 +12,7 @@ from purchasing.users.models import Department, User, Role
 from purchasing.data.contracts import ContractBase
 from purchasing.data.searches import SearchView
 
-from flask_login import current_user
+from flask_security import current_user
 
 # build filter and filter form
 FILTER_FIELDS = [
@@ -113,8 +113,8 @@ def feedback_handler(contract, search_for=None):
         ))
 
         feedback_sent = Notification(
-            to_email=db.session.query(User.email).join(Role, User.role_id == Role.id).filter(
-                Role.name.in_(['admin', 'superadmin'])
+            to_email=db.session.query(User.email).filter(
+                User.roles.any(Role.name.in_(['admin', 'superadmin']))
             ).all(),
             subject='Scout contract feedback - ID: {id}, Description: {description}'.format(
                 id=contract.id if contract.id else 'N/A',

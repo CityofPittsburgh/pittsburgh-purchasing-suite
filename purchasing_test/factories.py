@@ -13,6 +13,7 @@ from purchasing.data.companies import Company
 from purchasing.data.flows import Flow
 from purchasing.data.stages import Stage
 from purchasing.data.contract_stages import ContractStageActionItem, ContractStage
+from purchasing.public.models import AcceptedEmailDomains
 
 from purchasing.opportunities.models import (
     Opportunity, RequiredBidDocument, OpportunityDocument, Category,
@@ -42,13 +43,19 @@ class DepartmentFactory(BaseFactory):
 
 class UserFactory(BaseFactory):
     id = factory.Sequence(lambda n: n + 100)
-    email = factory.Sequence(lambda n: '{}'.format(n))
+    email = factory.Sequence(lambda n: '{}@foo.com'.format(n))
     created_at = factory.Sequence(lambda n: datetime.datetime.now())
     first_name = factory.Sequence(lambda n: '{}'.format(n))
     last_name = factory.Sequence(lambda n: '{}'.format(n))
     department = factory.SubFactory(DepartmentFactory)
     active = factory.Sequence(lambda n: True)
-    role = factory.SubFactory(RoleFactory)
+    confirmed_at = factory.Sequence(lambda n: datetime.datetime.now())
+
+    @factory.post_generation
+    def roles(self, create, extracted, **kwargs):
+        if extracted:
+            for role in extracted:
+                self.roles.append(role)
 
     class Meta:
         model = User
@@ -145,3 +152,7 @@ class OpportunityDocumentFactory(BaseFactory):
 class JobStatusFactory(BaseFactory):
     class Meta:
         model = JobStatus
+
+class AcceptedEmailDomainsFactory(BaseFactory):
+    class Meta:
+        model = AcceptedEmailDomains

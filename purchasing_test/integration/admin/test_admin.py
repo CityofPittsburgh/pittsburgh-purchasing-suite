@@ -5,7 +5,7 @@ from purchasing_test.test_base import BaseTestCase
 from purchasing_test.util import insert_a_user, insert_a_role
 
 class TestAdmin(BaseTestCase):
-    render_templates = False
+    render_templates = True
 
     def setUp(self):
         super(TestAdmin, self).setUp()

@@ -339,10 +339,10 @@ u'''BEACON Update - Opportunity Updated: ID: {} | Title: {} | Publish Date: {} |
             contact can all edit the opportunity before it is published. After
             it is published, only conductors can edit it.
         '''
-        if self.is_public and user.role.name in ('conductor', 'admin', 'superadmin'):
+        if self.is_public and user.is_conductor():
             return True
         elif not self.is_public and \
-            (user.role.name in ('conductor', 'admin', 'superadmin') or
+            (user.is_conductor() or
                 user.id in (self.created_by_id, self.contact_id)):
                 return True
         return False
@@ -442,8 +442,8 @@ u'''BEACON Update - Opportunity Updated: ID: {} | Title: {} | Publish Date: {} |
         ).send(multi=True)
 
         Notification(
-            to_email=db.session.query(User.email).join(Role, User.role_id == Role.id).filter(
-                Role.name.in_(['conductor', 'admin', 'superadmin'])
+            to_email=db.session.query(User.email).filter(
+                User.roles.any(Role.name.in_(['conductor', 'admin', 'superadmin']))
             ).all(),
             subject='A new Beacon post needs review',
             html_template='opportunities/emails/admin_postforapproval.html',

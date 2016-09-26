@@ -10,10 +10,10 @@ from flask import (
     session, render_template, flash
 )
 
-from flask_login import current_user
+from flask_security import current_user
 
 from purchasing.database import db, get_or_create
-from purchasing.decorators import requires_roles
+from flask_security.decorators import roles_accepted
 from purchasing.utils import localize_datetime
 
 from purchasing.data.contracts import ContractBase
@@ -36,7 +36,7 @@ from purchasing.conductor.manager import blueprint
 
 @blueprint.route('/contract/<int:contract_id>', methods=['GET', 'POST'])
 @blueprint.route('/contract/<int:contract_id>/stage/<int:stage_id>', methods=['GET', 'POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def detail(contract_id, stage_id=-1):
     '''View to control an individual stage update process
 
@@ -168,7 +168,7 @@ def detail(contract_id, stage_id=-1):
     abort(404)
 
 @blueprint.route('/contract/<int:contract_id>/stage/<int:stage_id>/transition', methods=['GET', 'POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def transition(contract_id, stage_id):
     '''Transition a contract from one date to the next date
 
@@ -237,7 +237,7 @@ def transition(contract_id, stage_id):
     return redirect(url_for('conductor.detail', contract_id=contract.id))
 
 @blueprint.route('/contract/<int:contract_id>/stage/<int:stage_id>/extend')
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def extend(contract_id, stage_id):
     '''Extend a contract
 
@@ -281,7 +281,7 @@ def extend(contract_id, stage_id):
 
 
 @blueprint.route('/contract/<int:contract_id>/stage/<int:stage_id>/flow-switch/<int:flow_id>')
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def flow_switch(contract_id, stage_id, flow_id):
     '''Switch a contract's flow
 
@@ -318,7 +318,7 @@ def flow_switch(contract_id, stage_id, flow_id):
     ))
 
 @blueprint.route('/contract/<int:contract_id>/remove')
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def remove(contract_id):
     '''Remove a contract from conductor
 
@@ -347,7 +347,7 @@ def remove(contract_id):
     abort(404)
 
 @blueprint.route('/contract/<int:contract_id>/kill')
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def kill_contract(contract_id):
     '''Remove a contract from conductor and scout
 
@@ -376,7 +376,7 @@ def kill_contract(contract_id):
     abort(404)
 
 @blueprint.route('/contract/<int:contract_id>/stage/<int:stage_id>/note/<int:note_id>/delete')
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def delete_note(contract_id, stage_id, note_id):
     '''Delete a note from a conductor step
 
@@ -404,7 +404,7 @@ def delete_note(contract_id, stage_id, note_id):
     return redirect(url_for('conductor.detail', contract_id=contract_id))
 
 @blueprint.route('/contract/<int:contract_id>/assign/<int:user_id>')
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def reassign(contract_id, user_id):
     '''Reassign a contract to a new user
 
@@ -434,7 +434,7 @@ def reassign(contract_id, user_id):
 
 @blueprint.route('/contract/new', methods=['GET', 'POST'])
 @blueprint.route('/contract/<int:contract_id>/start', methods=['GET', 'POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def start_work(contract_id=-1):
     '''Start work on a contract
 

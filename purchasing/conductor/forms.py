@@ -6,7 +6,7 @@ from flask import current_app
 
 from flask_wtf import Form
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from flask_login import current_user
+from flask_security import current_user
 from wtforms import Form as NoCSRFForm
 from wtforms.fields import (
     TextField, IntegerField, DateField, TextAreaField, HiddenField,

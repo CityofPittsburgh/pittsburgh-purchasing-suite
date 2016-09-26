@@ -1,40 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from flask import (
-    redirect, url_for, flash, request,
-    render_template, current_app
-)
+from flask import request, render_template
+
 from werkzeug.wrappers import Response
-from flask_login import current_user
+from flask_security import current_user
 from functools import wraps
-
-def requires_roles(*roles):
-    '''
-    Takes in a list of roles and checks whether the user
-    has access to those role
-    '''
-    def check_roles(view_function):
-        @wraps(view_function)
-        def decorated_function(*args, **kwargs):
-
-            if current_user.is_anonymous:
-                flash('This feature is for city staff only. If you are staff, log in with your pittsburghpa.gov email using the link to the upper right.', 'alert-warning')
-                return redirect(request.args.get('next') or '/')
-            elif current_user.role.name not in roles:
-                flash('You do not have sufficent permissions to do that!', 'alert-danger')
-                return redirect(request.args.get('next') or '/')
-            return view_function(*args, **kwargs)
-        return decorated_function
-    return check_roles
-
-def logview(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        current_app.logger.info('SHERPAVIEW - Viewing page at {}'.format(
-            request.path
-        ))
-        return f(*args, **kwargs)
-    return decorated_function
 
 def wrap_form(form=None, form_name=None, template=None):
     '''

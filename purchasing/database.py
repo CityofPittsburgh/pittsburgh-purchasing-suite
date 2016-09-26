@@ -7,7 +7,7 @@ import datetime
 import sqlalchemy
 
 from purchasing.extensions import cache
-from flask_login import current_user
+from flask_security import current_user
 
 from sqlalchemy.sql.functions import GenericFunction
 from sqlalchemy.orm import relationship

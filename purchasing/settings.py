@@ -37,7 +37,18 @@ class Config(object):
     CONDUCTOR_TYPE = 'County'
     CONDUCTOR_DEPARTMENT = 'Multiple Departments'
     EXTERNAL_LINK_WARNING = os_env.get('EXTERNAL_LINK_WARNING', None)
-
+    SECURITY_EMAIL_SENDER = MAIL_DEFAULT_SENDER
+    SECURITY_CONFIRMABLE = True
+    SECURITY_REGISTERABLE = True
+    SECURITY_RECOVERABLE = True
+    SECURITY_TRACKABLE = True
+    SECURITY_CHANGEABLE = True
+    SECURITY_TOKEN_MAX_AGE = 60 * 60 * 24 * 30
+    # more of a namespacing than a traditional salt, see
+    # http://pythonhosted.org/itsdangerous/#the-salt
+    # for more information
+    SECURITY_PASSWORD_SALT = os_env.get('SECURITY_PASSWORD_SALT', 'salty')
+    MAIL_SERVER = os_env.get('MAIL_SERVER', 'smtp.gmail.com')
 
 class ProdConfig(Config):
     """Production configuration."""
@@ -49,13 +60,13 @@ class ProdConfig(Config):
     S3_USE_HTTPS = True
     FLASK_ASSETS_USE_S3 = True
     UGLIFYJS_EXTRA_ARGS = ['-m']
-    MAIL_SERVER = 'smtp.sendgrid.net'
     MAIL_MAX_EMAILS = 100
     CELERY_BROKER_URL = os_env.get('REDIS_URL', 'redis://localhost:6379/0')
     CELERY_RESULT_BACKEND = os_env.get('REDIS_URL', 'redis://localhost:6379/0')
     CACHE_TYPE = 'redis'
     CACHE_REDIS_URL = os_env.get('REDIS_URL', 'redis://localhost:6379/0')
     CACHE_DEFAULT_TIMEOUT = 30
+    SECURITY_PASSWORD_HASH = 'bcrypt'
 
 class DevConfig(Config):
     """Development configuration."""
@@ -65,7 +76,6 @@ class DevConfig(Config):
     SQLALCHEMY_ECHO = os_env.get('SQLALCHEMY_ECHO', False)
     DEBUG_TB_ENABLED = True
     BROWSERID_URL = os_env.get('BROWSERID_URL', 'http://127.0.0.1:9000')
-    MAIL_SERVER = 'smtp.gmail.com'  # Use gmail in dev: https://support.google.com/mail/answer/1173270?hl=en
     ASSETS_DEBUG = True
     UPLOAD_S3 = False
     UPLOAD_DESTINATION = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'uploads'))
@@ -76,6 +86,7 @@ class DevConfig(Config):
     UGLIFYJS_BIN = os.path.join(PROJECT_ROOT, 'node_modules', '.bin', 'uglifyjs')
     LESS_BIN = os.path.join(PROJECT_ROOT, 'node_modules', '.bin', 'lessc')
     # MAIL_SUPPRESS_SEND = True
+    SECURITY_PASSWORD_HASH = 'bcrypt'
 
 class TestConfig(Config):
     TESTING = True
@@ -90,3 +101,4 @@ class TestConfig(Config):
     UPLOAD_FOLDER = UPLOAD_DESTINATION
     CELERY_ALWAYS_EAGER = True
     DISPLAY_TIMEZONE = pytz.timezone('UTC')
+    SECURITY_PASSWORD_SALT = 'test'

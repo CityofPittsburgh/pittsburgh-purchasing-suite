@@ -11,7 +11,10 @@ from purchasing.jobs.beacon_nightly import BeaconNewOppotunityOpenJob, BeaconBiw
 from purchasing.jobs.job_base import JobStatus
 
 from purchasing_test.test_base import BaseTestCase
-from purchasing_test.factories import OpportunityFactory, VendorFactory, CategoryFactory, UserFactory
+from purchasing_test.factories import (
+    OpportunityFactory, VendorFactory, CategoryFactory, UserFactory,
+    RoleFactory
+)
 
 class TestBeaconJobs(BaseTestCase):
     def setUp(self):
@@ -22,7 +25,8 @@ class TestBeaconJobs(BaseTestCase):
         tomorrow = datetime.datetime.today() + datetime.timedelta(days=1)
 
         self.category = CategoryFactory.create()
-        self.admin = UserFactory.create()
+        admin_role = RoleFactory.create(name='admin')
+        self.admin = UserFactory.create(roles=[admin_role])
 
         self.opportunity = OpportunityFactory.create(
             is_public=True, planned_publish=today, planned_submission_start=today,

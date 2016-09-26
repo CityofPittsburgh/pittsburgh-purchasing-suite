@@ -19,18 +19,13 @@ from purchasing.data.stages import Stage
 from purchasing.opportunities.models import RequiredBidDocument, Category
 
 from purchasing.conductor.forms import validate_integer
-from purchasing.extensions import login_manager
 from purchasing.users.models import User, Role, Department
 from purchasing.public.models import AcceptedEmailDomains
 from purchasing.opportunities.models import Opportunity
 
 GLOBAL_EXCLUDE = [
-    'created_at', 'updated_at', 'created_by', 'updated_by'
+    'created_at', 'updated_at', 'created_by', 'updated_by', 'password'
 ]
-
-@login_manager.user_loader
-def load_user(userid):
-    return User.get_by_id(int(userid))
 
 class BaseModelViewAdmin(sqla.ModelView):
     form_excluded_columns = GLOBAL_EXCLUDE
@@ -280,9 +275,7 @@ class ConductorContractAdmin(ContractBaseAdmin):
         return form
 
     def _get_filtered_users(self):
-        return self.session.query(User).join(
-            Role, User.role_id == Role.id
-        ).filter(
+        return self.session.query(User).filter(
             Role.name.in_(['conductor', 'admin', 'superadmin'])
         )
 
@@ -353,49 +346,43 @@ class EmailDomainAdmin(AuthMixin, BaseModelViewAdmin):
     pass
 
 class UserAdmin(AuthMixin, BaseModelViewAdmin):
-    form_columns = ['email', 'first_name', 'last_name', 'department', 'role']
+    form_columns = ['email', 'first_name', 'last_name', 'department', 'roles']
+    column_exclude_list = GLOBAL_EXCLUDE + ['last_login_at', 'current_login_at',
+    'last_login_ip', 'current_login_ip', 'login_count']
+
 
     form_extra_fields = {
         'department': sqla.fields.QuerySelectField(
             'Department', query_factory=Department.query_factory,
             allow_blank=True, blank_text='-----'
         ),
-        'role': sqla.fields.QuerySelectField(
-            'Role', query_factory=Role.no_admins,
-            allow_blank=True, blank_text='-----'
-        )
     }
 
     def get_query(self):
         '''Override default get query to limit to assigned contracts
         '''
-        return super(UserAdmin, self).get_query().join(
-            Role, User.role_id == Role.id
-        ).filter(
-            db.func.lower(Role.name) != 'superadmin'
+        return super(UserAdmin, self).get_query().filter(
+            User.roles.any(Role.name != 'superadmin')
         )
 
     def get_count_query(self):
         '''Override default get count query to conform to above
         '''
-        return super(UserAdmin, self).get_count_query().join(
-            Role, User.role_id == Role.id
-        ).filter(
-            db.func.lower(Role.name) != 'superadmin'
+        return super(UserAdmin, self).get_count_query().filter(
+            User.roles.any(Role.name != 'superadmin')
         )
 
 class UserRoleAdmin(SuperAdminMixin, BaseModelViewAdmin):
-    form_columns = ['email', 'first_name', 'last_name', 'department', 'role']
+    form_columns = ['email', 'first_name', 'last_name', 'department', 'roles']
+    column_exclude_list = GLOBAL_EXCLUDE + ['last_login_at', 'current_login_at',
+    'last_login_ip', 'current_login_ip', 'login_count']
+
 
     form_extra_fields = {
         'department': sqla.fields.QuerySelectField(
             'Department', query_factory=Department.query_factory,
             allow_blank=True, blank_text='-----'
         ),
-        'role': sqla.fields.QuerySelectField(
-            'Role', query_factory=Role.query_factory,
-            allow_blank=True, blank_text='-----'
-        )
     }
 
 class RoleAdmin(SuperAdminMixin, BaseModelViewAdmin):

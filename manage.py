@@ -8,13 +8,13 @@ from flask_migrate import MigrateCommand
 from flask.ext.assets import ManageAssets
 
 from purchasing.app import create_app
-from purchasing.database import db
+from purchasing.database import db, get_or_create
 from purchasing.utils import (
     connect_to_s3, upload_file, turn_off_sqlalchemy_events,
     turn_on_sqlalchemy_events, refresh_search_view
 )
 
-from purchasing.public.models import AppStatus
+from purchasing.public.models import AppStatus, AcceptedEmailDomains
 from purchasing.data.importer.stages_and_flows import seed_stages_and_flows
 
 from purchasing import jobs as nightly_jobs
@@ -35,31 +35,43 @@ def _make_context():
 @manager.option('-e', '--email', dest='email', default=None)
 @manager.option('-r', '--role', dest='role', default=None)
 @manager.option('-d', '--department', dest='dept', default='Other')
-def seed_user(email, role, dept):
+@manager.option('-p', '--password', dest='password', default='password')
+def seed_user(email, role, dept, password):
     '''
     Creates a new user in the database.
     '''
-    from purchasing.users.models import User, Department
+    from purchasing.users.models import User, Department, Role
+    from flask_security import SQLAlchemyUserDatastore
+    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     seed_email = email if email else app.config.get('SEED_EMAIL')
     user_exists = User.query.filter(User.email == seed_email).first()
     department = Department.query.filter(
-            Department.name == db.func.lower(dept)
-            ).first()
+        Department.name == db.func.lower(dept)
+    ).first()
     if user_exists:
         print 'User {email} already exists'.format(email=seed_email)
     else:
         try:
-            new_user = User.create(
+            user_datastore.create_user(
                 email=seed_email,
                 created_at=datetime.datetime.utcnow(),
-                role_id=role,
-                department=department if department else None
+                department=department if department else None,
+                password=password,
+                roles=[Role.query.get(int(role))],
+                confirmed_at=datetime.datetime.now()
             )
-            db.session.add(new_user)
             db.session.commit()
             print 'User {email} successfully created!'.format(email=seed_email)
         except Exception, e:
             print 'Something went wrong: {exception}'.format(exception=e.message)
+    return
+
+@manager.option('-d', '--domain', dest='domain')
+def create_domain(domain):
+    print 'Creating domain {}'.format(domain)
+    get_or_create(db.session, model=AcceptedEmailDomains, domain=domain)
+    db.session.commit()
+    print 'Done'
     return
 
 @manager.option(

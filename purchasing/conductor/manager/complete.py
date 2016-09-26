@@ -7,9 +7,9 @@ from flask import (
     session, redirect, url_for, current_app,
     render_template, abort, request, jsonify
 )
-from flask_login import current_user
+from flask_security import current_user
 
-from purchasing.decorators import requires_roles
+from flask_security.decorators import roles_accepted
 from purchasing.database import db, get_or_create
 from purchasing.notifications import Notification
 
@@ -25,7 +25,7 @@ from purchasing.conductor.util import parse_companies, json_serial
 from purchasing.conductor.manager import blueprint
 
 @blueprint.route('/contract/<int:contract_id>/edit/contract', methods=['GET', 'POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def edit(contract_id):
     '''Update information about a contract
 
@@ -76,7 +76,7 @@ def edit(contract_id):
     abort(404)
 
 @blueprint.route('/contract/<int:contract_id>/edit/company', methods=['GET', 'POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def edit_company(contract_id):
     '''Update information about companies
 
@@ -113,7 +113,7 @@ def edit_company(contract_id):
     abort(404)
 
 @blueprint.route('/contract/<int:contract_id>/edit/contacts', methods=['GET', 'POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def edit_company_contacts(contract_id):
     '''Update information about company contacts, and save all information
 
@@ -219,7 +219,7 @@ CONDUCTOR CONTRACT COMPLETE - company contacts for contract "{}" assigned. |New 
     abort(404)
 
 @blueprint.route('/contract/<int:contract_id>/edit/success')
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def success(contract_id):
     '''Render the success template after completing a contract
 
@@ -235,7 +235,7 @@ def success(contract_id):
     return redirect(url_for('conductor.edit_company_contacts', contract_id=contract_id))
 
 @blueprint.route('/contract/<int:contract_id>/edit/url-exists', methods=['POST'])
-@requires_roles('conductor', 'admin', 'superadmin')
+@roles_accepted('conductor', 'admin', 'superadmin')
 def url_exists(contract_id):
     '''Check to see if a url returns an actual page
 

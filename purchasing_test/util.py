@@ -87,13 +87,20 @@ def create_a_user(email='foo@foo.com', department='Other', role=None):
         department=DepartmentFactory.create(name=department), role=role
     )
 
-def insert_a_user(email=None, department=None, role=None):
+def insert_a_user(email=None, department=None, role=None, pw='password'):
     role = role if role else RoleFactory.create()
     try:
         if email:
-            user = UserFactory.create(email=email, role=role, department=department)
+            user = UserFactory.create(
+                email=email, roles=[role], department=department,
+                confirmed_at=datetime.datetime.now(),
+                password=pw
+            )
         else:
-            user = UserFactory.create(role=role, department=department)
+            user = UserFactory.create(
+                roles=[role], department=department,
+                password=pw, confirmed_at=datetime.datetime.now()
+            )
         return user
     except IntegrityError:
         db.session.rollback()
@@ -101,8 +108,7 @@ def insert_a_user(email=None, department=None, role=None):
 
 def insert_a_role(name):
     try:
-        role = RoleFactory(name=name)
-        role.save()
+        role = RoleFactory.create(name=name)
         return role
     except IntegrityError:
         db.session.rollback()
