@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import random
+from flask_security.utils import encrypt_password
+
 from flask.ext.login import AnonymousUserMixin
 from flask.ext.security import UserMixin, RoleMixin
 
@@ -10,6 +13,10 @@ roles_users = db.Table(
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('roles.id'))
 )
+
+def rand_alphabet():
+    ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    return encrypt_password(''.join(random.choice(ALPHABET) for i in range(16)))
 
 class Role(SurrogatePK, RoleMixin, Model):
     '''Model to handle view-based permissions
@@ -87,7 +94,7 @@ class User(UserMixin, SurrogatePK, Model):
         foreign_keys=department_id, primaryjoin='User.department_id==Department.id'
     )
 
-    password = db.Column(db.String(255))
+    password = db.Column(db.String(255), nullable=False, default=rand_alphabet)
 
     confirmed_at = db.Column(db.DateTime)
     last_login_at = db.Column(db.DateTime)
