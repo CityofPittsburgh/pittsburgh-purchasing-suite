@@ -229,13 +229,14 @@ def signups():
 
     :status 200: Download a tab-separated file of all vendor signups
     '''
+    vendors = Vendor.query.outerjoin(Vendor.opportunities, Vendor.categories).all()
+
     def stream():
         # yield the title columns
         yield 'first_name\tlast_name\tbusiness_name\temail\tphone_number\t' +\
             'minority_owned\twoman_owned\tveteran_owned\t' +\
             'disadvantaged_owned\tcategories\topportunities\n'
 
-        vendors = Vendor.query.all()
         for vendor in vendors:
             row = vendor.build_downloadable_row()
             yield '\t'.join([unicode(i) for i in row]) + '\n'
