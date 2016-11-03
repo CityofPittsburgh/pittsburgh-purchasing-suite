@@ -8,10 +8,9 @@ from flask import (
 )
 from flask_security import current_user
 
-from sqlalchemy.orm import joinedload
-
 from purchasing.database import db
 from flask_security.decorators import roles_accepted
+from purchasing.users.models import User
 
 from purchasing.opportunities.models import Opportunity, Vendor, OpportunityDocument
 from purchasing.opportunities.forms import OpportunityForm
@@ -230,7 +229,7 @@ def signups():
 
     :status 200: Download a tab-separated file of all vendor signups
     '''
-    vendors = Vendor.query.options(joinedload(Vendor.opportunities), joinedload(Vendor.categories)).all()
+    vendors = Vendor.query.outerjoin(Vendor.opportunities, Vendor.categories).all()
 
     def stream():
         # yield the title columns
