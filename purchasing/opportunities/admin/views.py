@@ -9,10 +9,11 @@ from flask import (
 from flask_security import current_user
 
 from purchasing.database import db
-from flask_security.decorators import roles_accepted
-from purchasing.users.models import User
+from sqlalchemy import text
 
-from purchasing.opportunities.models import Opportunity, Vendor, OpportunityDocument
+from flask_security.decorators import roles_accepted
+
+from purchasing.opportunities.models import Opportunity, OpportunityDocument
 from purchasing.opportunities.forms import OpportunityForm
 
 from purchasing.notifications import Notification
@@ -229,7 +230,19 @@ def signups():
 
     :status 200: Download a tab-separated file of all vendor signups
     '''
-    vendors = Vendor.query.outerjoin(Vendor.opportunities, Vendor.categories).all()
+    vendors = db.engine.execute(text('''
+        SELECT
+            v.first_name, v.last_name, v.business_name, v.email, v.phone_number,
+            v.minority_owned, v.woman_owned, v.veteran_owned, v.disadvantaged_owned,
+            array_to_string(array_agg(c.category_friendly_name), '; ') AS categories,
+            array_to_string(array_agg(o.description), '; ') AS opportunities
+        FROM vendor v
+        LEFT JOIN opportunity_vendor_association_table ov ON v.id = ov.vendor_id
+        LEFT JOIN opportunity o ON ov.opportunity_id = o.id
+        LEFT JOIN category_vendor_association cv ON v.id = cv.vendor_id
+        LEFT JOIN category c ON cv.category_id = c.id
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
+    '''))
 
     def stream():
         # yield the title columns
@@ -238,8 +251,7 @@ def signups():
             'disadvantaged_owned\tcategories\topportunities\n'
 
         for vendor in vendors:
-            row = vendor.build_downloadable_row()
-            yield '\t'.join([unicode(i) for i in row]) + '\n'
+            yield '\t'.join([unicode(i) for i in vendor]) + '\n'
 
     current_app.logger.info('BEACON VENDOR CSV DOWNLOAD')
 
