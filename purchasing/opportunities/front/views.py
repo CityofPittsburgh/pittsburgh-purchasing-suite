@@ -48,7 +48,7 @@ def signup():
         vendor = Vendor.query.filter(Vendor.email == form.data.get('email')).first()
 
         if vendor:
-            current_app.logger.info('''
+            current_app.logger.info(u'''
                 OPPUPDATEVENDOR - Vendor updated:
                 EMAIL: {old_email} -> {email} at
                 BUSINESS: {old_bis} -> {bis_name} signed up for:
@@ -56,7 +56,8 @@ def signup():
                     {old_cats} ->
                     {categories}'''.format(
                 old_email=vendor.email, email=form.data['email'],
-                old_bis=vendor.business_name, bis_name=form.data['business_name'],
+                old_bis=unicode(vendor.business_name),
+                bis_name=unicode(form.data['business_name']),
                 old_cats=[i.__unicode__() for i in vendor.categories],
                 categories=[i.__unicode__() for i in form.data['categories']]
             ))

@@ -238,7 +238,7 @@ def signups():
         vendors = Vendor.query.all()
         for vendor in vendors:
             row = vendor.build_downloadable_row()
-            yield '\t'.join([str(i) for i in row]) + '\n'
+            yield '\t'.join([unicode(i) for i in row]) + '\n'
 
     current_app.logger.info('BEACON VENDOR CSV DOWNLOAD')
 

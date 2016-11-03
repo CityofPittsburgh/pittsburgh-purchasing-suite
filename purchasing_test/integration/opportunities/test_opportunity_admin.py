@@ -234,7 +234,7 @@ class TestOpportunitiesAdmin(TestOpportunitiesAdminBase):
 
         # insert some vendors
         self.client.post('/beacon/signup', data={
-            'email': 'foo@foo.com', 'business_name': 'foo',
+            'email': 'foo@foo.com', 'business_name': 'fóø',
             'subcategories-1': 'on', 'categories': 'Apparel'
         })
 
