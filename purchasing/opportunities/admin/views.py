@@ -235,7 +235,7 @@ def signups():
             v.first_name, v.last_name, v.business_name, v.email, v.phone_number,
             v.minority_owned, v.woman_owned, v.veteran_owned, v.disadvantaged_owned,
             array_to_string(array_agg(c.category_friendly_name), '; ') AS categories,
-            array_to_string(array_agg(o.description), '; ') AS opportunities
+            array_to_string(array_agg(o.title), '; ') AS opportunities
         FROM vendor v
         LEFT JOIN opportunity_vendor_association_table ov ON v.id = ov.vendor_id
         LEFT JOIN opportunity o ON ov.opportunity_id = o.id
