@@ -1,6 +1,11 @@
 from purchasing_test.test_base import BaseTestCase
 from purchasing.users.models import User
-from purchasing_test.factories import RoleFactory, AcceptedEmailDomainsFactory
+from purchasing_test.factories import (
+    RoleFactory, AcceptedEmailDomainsFactory, UserFactory,
+    DepartmentFactory
+)
+
+from purchasing_test.util import insert_a_role, insert_a_user
 
 class TestUsers(BaseTestCase):
     render_templates = True
@@ -28,3 +33,23 @@ class TestUsers(BaseTestCase):
         ))
         self.assertEquals(User.query.count(), 1)
         self.assertTrue(User.query.first().has_role('staff'))
+
+    def test_profile_update(self):
+        admin = insert_a_role('admin')
+        department1 = DepartmentFactory.create()
+        department2 = DepartmentFactory.create()
+        user = insert_a_user(role=admin, department=department1)
+
+        self.assertEquals(user.department, department1)
+        self.login_user(user)
+
+        self.client.post('/users/profile', data=dict(
+            first_name='foo',
+            last_name='bar',
+            department=department2.id
+        ))
+
+        self.assertEquals(user.first_name, 'foo')
+        self.assertEquals(user.last_name, 'bar')
+        self.assertEquals(user.department, department2)
+        self.assert_flashes('Updated your profile!', 'alert-success')
