@@ -231,19 +231,15 @@ class TestOpportunitiesAdmin(TestOpportunitiesAdminBase):
         self.assert_flashes('You do not have sufficent permissions to do that! If you are city staff, make sure you are logged in using the link to the upper right.', 'alert-warning')
 
     def test_signup_download_staff(self):
-
         # insert some vendors
-        self.client.post('/beacon/signup', data={
-            'email': 'foo@foo.com', 'business_name': 'fóø',
-            'subcategories-1': 'on', 'categories': 'Apparel'
-        })
+        v1 = Vendor.query.filter(Vendor.email == 'foo@foo.com').first()
+        v1.categories.add(Category.query.first())
+        db.session.commit()
 
-        self.client.post('/beacon/signup', data={
-            'email': 'foo2@foo.com', 'business_name': 'foo',
-            'subcategories-1': 'on', 'subcategories-2': 'on',
-            'subcategories-3': 'on', 'subcategories-4': 'on',
-            'subcategories-5': 'on', 'categories': 'Apparel'
-        })
+        v2 = Vendor.create(**{'email': 'foo2@foo.com', 'business_name': 'foo'})
+        for i in Category.query.all():
+            v2.categories.add(i)
+        db.session.commit()
 
         self.login_user(self.staff)
         request = self.client.get('/beacon/admin/signups')
