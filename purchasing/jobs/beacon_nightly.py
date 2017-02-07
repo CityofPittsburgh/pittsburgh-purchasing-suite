@@ -62,7 +62,6 @@ class BeaconNewOppotunityOpenJob(EmailJobBase):
             Opportunity.is_public == True
         ).all()
 
-@JobBase.register
 class BeaconBiweeklyDigestJob(EmailJobBase):
     '''Send a biweekly update of all non-expired Opportunities posted to Beacon
     '''
@@ -77,7 +76,9 @@ class BeaconBiweeklyDigestJob(EmailJobBase):
     def should_run(self):
         '''Returns true only if we are on the first or fifteenth of the month or time_override is True
         '''
-        return datetime.datetime.today().day in [1, 15] or self.time_override
+        if self.time_override is True:
+            return True
+        return False
 
     def build_notifications(self):
         '''Implements EmailJobBase build_notifications method
