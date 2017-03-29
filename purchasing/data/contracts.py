@@ -730,7 +730,7 @@ class ContractProperty(RefreshSearchViewMixin, Model):
     value = Column(db.Text)
 
     def __unicode__(self):
-        return '{key}: {value}'.format(key=self.key, value=self.value)
+        return u'{key}: {value}'.format(key=self.key, value=self.value)
 
 class ContractNote(Model):
     '''Model for contract notes
