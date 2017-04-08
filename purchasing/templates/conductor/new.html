@@ -14,7 +14,7 @@
       {% endif %}
 
       <form class="form" method="POST" action="{% if contract_id > 0 %}{{ url_for('conductor.start_work', contract_id=contract_id) }}{% else %}{{ url_for('conductor.start_work') }}{% endif %}">
-        {{ form.csrf_token() }}
+        {{ form.csrf_token }}
 
         <div class="form-group">
           <label for="description">Description of goods/services needed <span class="form-required">*</span></label>

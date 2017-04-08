@@ -23,7 +23,7 @@
         <tbody>
           {% for contract in contracts %}
           <form class="form-horizontal" method="POST" action="{{ url_for('conductor_uploads.costars_contract_upload') }}" enctype="multipart/form-data">
-            {{ form.csrf_token() }}
+            {{ form.csrf_token }}
             <tr>
               <td>{{ contract.description }}</td>
               <td>

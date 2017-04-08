@@ -5,7 +5,7 @@
     <form method="POST" enctype="multipart/form-data" action="{{ url_for('conductor.detail', contract_id=contract.id, stage_id=active_stage.id, form='post') }}" id="js-conductor-post-opportunity-form">
 
       {% set form = opportunity_form %}
-      {{ form.csrf_token() }}
+      {{ form.csrf_token }}
 
       <h4>Post opportunity to Beacon</h4>
 

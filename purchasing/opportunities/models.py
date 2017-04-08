@@ -10,8 +10,7 @@ from purchasing.utils import localize_today, localize_now
 
 from sqlalchemy.schema import Table
 from sqlalchemy.orm import backref
-from sqlalchemy.dialects.postgres import ARRAY
-from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
 
 from purchasing.notifications import Notification
 from purchasing.utils import build_downloadable_groups, random_id

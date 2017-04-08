@@ -5,7 +5,7 @@ from collections import defaultdict
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
-from sqlalchemy.dialects.postgres import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from purchasing.database import db, Model, Column
 from purchasing.utils import localize_datetime

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 
 from wtforms.fields import TextField, TextAreaField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Email, NumberRange
@@ -8,7 +8,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 from purchasing.data.contracts import ContractType
 
-class SearchForm(Form):
+class SearchForm(FlaskForm):
     '''Form to handle Scout search and filter
 
     Attributes:
@@ -43,7 +43,7 @@ class SearchForm(Form):
     def __init__(self, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
 
-class FeedbackForm(Form):
+class FeedbackForm(FlaskForm):
     '''Form to collect sender and body for Scout contract feedback
 
     Attributes:
@@ -57,7 +57,7 @@ class FeedbackForm(Form):
         super(FeedbackForm, self).__init__(*args, **kwargs)
 
 
-class NoteForm(Form):
+class NoteForm(FlaskForm):
     '''Form to allow users to write notes about contracts
 
     Attributes:

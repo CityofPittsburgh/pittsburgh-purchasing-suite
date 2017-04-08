@@ -12,7 +12,7 @@
       {% else %}
       <form class="form form-horizontal" method="POST" action="{{ url_for('scout.search_feedback', search_for=search_for) }}">
       {% endif %}
-        {{ feedback_form.csrf_token() }}
+        {{ feedback_form.csrf_token }}
         <div class="form-group">
           <label class="col-md-3 control-label">Feedback about:</label>
           <div class="col-md-6">
