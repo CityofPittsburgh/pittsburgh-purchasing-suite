@@ -9,7 +9,7 @@
     <h3>Create New Flow</h3>
 
     <form class="form form-horizontal" method="POST" action="{{ url_for('conductor.new_flow') }}">
-      {{ form.csrf_token() }}
+      {{ form.csrf_token }}
 
       <div class="form-group">
         <label for="flow_name" class="col-sm-2 control-label">Name</label>

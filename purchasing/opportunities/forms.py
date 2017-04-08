@@ -9,7 +9,7 @@ from collections import defaultdict
 from werkzeug import secure_filename
 
 from flask import current_app, request
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import widgets, fields, Form as NoCSRFForm
 from wtforms.ext.dateutil.fields import DateTimeField
@@ -80,7 +80,7 @@ class DynamicSelectField(fields.SelectField):
                 return False
         return True
 
-class CategoryForm(Form):
+class CategoryForm(FlaskForm):
     '''Base form for anything involving Beacon categories
 
     "Categories" and "Subcategories" are originally derived from NIGP codes.
@@ -251,7 +251,7 @@ class VendorSignupForm(CategoryForm):
         default="checked"
     )
 
-class OpportunitySignupForm(Form):
+class OpportunitySignupForm(FlaskForm):
     '''Signup form vendors can use for individual opportunities
 
     Attributes:
@@ -264,7 +264,7 @@ class OpportunitySignupForm(Form):
     email = fields.TextField(validators=[DataRequired(), Email()])
     also_categories = fields.BooleanField()
 
-class UnsubscribeForm(Form):
+class UnsubscribeForm(FlaskForm):
     '''Subscription management form, where Vendors can unsubscribe from all different emails
 
     Attributes:

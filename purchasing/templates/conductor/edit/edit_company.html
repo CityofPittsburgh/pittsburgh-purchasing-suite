@@ -24,7 +24,7 @@
       {% endif %}
 
       <form class="form" method="POST" action="{{ url_for('conductor.edit_company', contract_id=contract.id) }}">
-        {{ form.csrf_token() }}
+        {{ form.csrf_token }}
 
           <div class="company-name-form">
           {% for company in form.companies.entries %}

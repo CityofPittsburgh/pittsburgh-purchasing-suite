@@ -14,7 +14,7 @@ security = Security()
 from flask_migrate import Migrate
 migrate = Migrate()
 
-from flask_cache import Cache
+from flask_caching import Cache
 cache = Cache()
 
 from flask_debugtoolbar import DebugToolbarExtension

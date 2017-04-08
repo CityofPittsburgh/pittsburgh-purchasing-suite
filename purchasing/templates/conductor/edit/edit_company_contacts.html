@@ -10,7 +10,7 @@
       <h3>Editing Company Contacts for {{ contract.description|title }}</h3>
 
       <form class="form" method="POST" action="{{ url_for('conductor.edit_company_contacts', contract_id=contract.id) }}">
-        {{ form.csrf_token() }}
+        {{ form.csrf_token }}
 
         {% for company in form.companies.entries %}
           <h4><strong>{{ companies[loop.index - 1].company_name }}</strong></h4>

@@ -12,7 +12,7 @@
 
   <div class="col-md-5">
     <form class="form pull-right" method="POST" action="{{ url_for('conductor.transition', contract_id=contract.id, stage_id=active_stage.id, destination=active_stage.stage_id) }}">
-      {{ complete_form.csrf_token() }}
+      {{ complete_form.csrf_token }}
 
       {% include "conductor/detail/_mark_complete_datepicker.html" %}
 
@@ -38,7 +38,7 @@
   </div>
   <div class="col-md-5">
     <form class="form pull-right" method="POST" action="{{ url_for('conductor.transition', contract_id=contract.id, stage_id=active_stage.id) }}">
-      {{ complete_form.csrf_token() }}
+      {{ complete_form.csrf_token }}
 
       {% include "conductor/detail/_mark_complete_datepicker.html" %}
 

@@ -2,7 +2,7 @@
 
 import re
 
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms.fields import TextField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from purchasing.users.models import Department
@@ -12,7 +12,7 @@ from purchasing.users.models import Role
 
 DOMAINS = re.compile('@[\w.]+')
 
-class DepartmentForm(Form):
+class DepartmentForm(FlaskForm):
     '''Allows user to update profile information
 
     Attributes:

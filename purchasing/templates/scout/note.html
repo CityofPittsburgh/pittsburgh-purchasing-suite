@@ -16,7 +16,7 @@
 
 {% if not current_user.is_anonymous %}
 <form method="POST" action="{{ url_for('scout.contract', contract_id=contract.id) }}">
-  {{ note_form.csrf_token() }}
+  {{ note_form.csrf_token }}
 
   {% if 'user' in note_form.errors %}
   <div class="alert alert-danger alert-dismissible" role="alert">

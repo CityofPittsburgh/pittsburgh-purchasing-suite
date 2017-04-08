@@ -2,8 +2,8 @@
 import random
 from flask_security.utils import encrypt_password
 
-from flask.ext.login import AnonymousUserMixin
-from flask.ext.security import UserMixin, RoleMixin
+from flask_login import AnonymousUserMixin
+from flask_security import UserMixin, RoleMixin
 
 from purchasing.database import Column, db, Model, ReferenceCol, SurrogatePK
 from sqlalchemy.orm import backref

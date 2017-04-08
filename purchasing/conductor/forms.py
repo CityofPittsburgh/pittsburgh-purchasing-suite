@@ -4,7 +4,7 @@ import datetime
 
 from flask import current_app
 
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from flask_security import current_user
 from wtforms import Form as NoCSRFForm
@@ -45,7 +45,7 @@ class DynamicStageSelectField(SelectField):
             return False
         return True
 
-class FlowForm(Form):
+class FlowForm(FlaskForm):
     '''Form for editing existing form metadata
 
     Attributes:
@@ -57,7 +57,7 @@ class FlowForm(Form):
     flow_name = TextField(validators=[DataRequired(), validate_unique_name])
     is_archived = BooleanField()
 
-class NewFlowForm(Form):
+class NewFlowForm(FlaskForm):
     '''Form for creating new flows
 
     Attributes:
@@ -84,7 +84,7 @@ class NewFlowForm(Form):
         for i in self.stage_order.entries:
             i.choices = self.stages
 
-class CompleteForm(Form):
+class CompleteForm(FlaskForm):
     '''Form to hold the completion times
 
     Attributes:
@@ -114,7 +114,7 @@ class CompleteForm(Form):
         self.started = started.replace(second=0, microsecond=0) if started else None
         self.maximum = datetime.datetime.utcnow()
 
-class NewContractForm(Form):
+class NewContractForm(FlaskForm):
     '''Form for starting new work on a contract through conductor
 
     Attributes:
@@ -150,7 +150,7 @@ class NewContractForm(Form):
     )
     start = DateTimeField(default=get_default)
 
-class ContractMetadataForm(Form):
+class ContractMetadataForm(FlaskForm):
     '''Edit a contract's metadata during the renewal process
 
     Attributes:
@@ -226,7 +226,7 @@ class AttachmentForm(NoCSRFForm):
         FileAllowed(['doc', 'docx', 'xls', 'xlsx', 'pdf'], message='Invalid file type')
     ])
 
-class SendUpdateForm(Form):
+class SendUpdateForm(FlaskForm):
     '''Form to send an email update
 
     Attributes:
@@ -365,7 +365,7 @@ class PostOpportunityForm(OpportunityForm):
 
         return action
 
-class NoteForm(Form):
+class NoteForm(FlaskForm):
     '''Form to take notes
 
     Attributes:
@@ -402,7 +402,7 @@ class NoteForm(Form):
         }
         return action
 
-class FileUploadForm(Form):
+class FileUploadForm(FlaskForm):
     '''Form to take new costars data for upload
 
     Attributes:
@@ -412,7 +412,7 @@ class FileUploadForm(Form):
         FileAllowed(['csv'], message='.csv files only')
     ])
 
-class ContractUploadForm(Form):
+class ContractUploadForm(FlaskForm):
     '''Form to upload a pdf for a costars contract
 
     Attributes:
@@ -425,7 +425,7 @@ class ContractUploadForm(Form):
         FileAllowed(['pdf'], message='.pdf files only')
     ])
 
-class EditContractForm(Form):
+class EditContractForm(FlaskForm):
     '''Form to control details needed to finalize a new/renewed contract
 
     Attributes:
@@ -524,7 +524,7 @@ class CompanyForm(NoCSRFForm):
         ]
     )
 
-class CompanyListForm(Form):
+class CompanyListForm(FlaskForm):
     '''Form that holds lists of new/existing companies
 
     Attributes:
@@ -548,7 +548,7 @@ class CompanyContactList(NoCSRFForm):
     '''
     contacts = FieldList(FormField(CompanyContactForm), min_entries=1)
 
-class CompanyContactListForm(Form):
+class CompanyContactListForm(FlaskForm):
     '''Outer form to collect all contacts for all companies for the contract
 
     Attributes:

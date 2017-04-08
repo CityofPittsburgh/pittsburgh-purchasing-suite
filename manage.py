@@ -5,7 +5,7 @@ import os
 from flask import current_app
 from flask_script import Manager, Shell, Server, prompt_bool
 from flask_migrate import MigrateCommand
-from flask.ext.assets import ManageAssets
+from flask_assets import ManageAssets
 
 from purchasing.app import create_app
 from purchasing.database import db, get_or_create
