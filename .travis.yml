@@ -9,7 +9,7 @@ before_script:
 - psql -c 'create database purchasing_test;' -U postgres
 script: PYTHONPATH=. nosetests purchasing_test/ --with-coverage --cover-package=purchasing
 addons:
-  postgresql: "9.4"
+  postgresql: "9.6"
 notifications:
   webhooks: http://project-monitor.codeforamerica.org/projects/6a9169a2-749e-197b-b402-d7b2fd555d31/status
   slack:
