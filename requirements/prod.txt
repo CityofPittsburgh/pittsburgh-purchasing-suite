@@ -2,6 +2,7 @@
 
 # Flask
 Flask==0.12.1
+Werkzeug==0.14.1
 
 # Database
 Flask-SQLAlchemy==2.2
