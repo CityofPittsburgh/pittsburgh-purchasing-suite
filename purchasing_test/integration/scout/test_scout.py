@@ -30,9 +30,9 @@ class TestScout(BaseTestCase):
         )
 
         # insert the companies/contracts
-        self.company1 = insert_a_company(name='ship', insert_contract=False)
-        self.company2 = insert_a_company(name='boat', insert_contract=False)
-        self.company3 = insert_a_company(name='Ground Tech dba D’Appolonia',
+        self.company1 = insert_a_company(name=u'ship', insert_contract=False)
+        self.company2 = insert_a_company(name=u'boat', insert_contract=False)
+        self.company3 = insert_a_company(name=u'Ground Tech dba D’Appolonia',
             insert_contract=False)
         insert_a_contract(
             description='vessel', companies=[self.company2], line_items=[LineItem(description='NAVY')]
