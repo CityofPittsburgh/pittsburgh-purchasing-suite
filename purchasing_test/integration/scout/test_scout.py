@@ -32,6 +32,7 @@ class TestScout(BaseTestCase):
         # insert the companies/contracts
         self.company1 = insert_a_company(name='ship', insert_contract=False)
         self.company2 = insert_a_company(name='boat', insert_contract=False)
+        self.company3 = insert_a_company(name='éééé', insert_contract=False)
         insert_a_contract(
             description='vessel', companies=[self.company2], line_items=[LineItem(description='NAVY')]
         )
@@ -60,6 +61,9 @@ class TestScout(BaseTestCase):
         # test that invalid company ids 404
         self.assert404(self.client.get('/scout/companies/abcd'))
         self.assert404(self.client.get('/scout/companies/999'))
+
+    def test_company_unicode(self):
+        self.assert200(self.client.get('/scout/companies/{}'.format(self.company3.id)))
 
     def test_contracts(self):
         request = self.client.get('/scout/contracts/{}'.format(self.contract1.id))
