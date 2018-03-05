@@ -11,7 +11,7 @@
       <div class="well scout-well">
         <div class="row">
         <div class="col-md-9">
-          <h3><strong>{{ company.company_name|title }}</strong></h3>
+          <h3><strong>{{ company.company_name.decode('utf-8')|title }}</strong></h3>
           {% if current_user.is_admin() %}
           <p>
             <a href="{{ url_for('company.edit_view', id=company.id) }}">Edit this company</a>
