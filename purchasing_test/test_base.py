@@ -67,11 +67,11 @@ class BaseTestCase(FlaskTestCase):
             assert expected_message in messages
             assert expected_category in categories
 
-    def login_user(self, user):
+    def login_user(self, user, password='password'):
         self.logout_user()
         return self.client.post('/login', data=dict(
             email=user.email,
-            password=user.password,
+            password='password',
             remember='y'
         ))
 

@@ -6,7 +6,7 @@
     <span class="sr-only">Toggle Dropdown</span>
     </a>
     <ul class="dropdown-menu" role="menu">
-        {% if current_user.is_conductor() %}
+        {% if current_user.is_admin() %}
         <li><a class="navbar-link" href="{{ url_for('admin.index') }}">Admin</a></li>
         {% endif %}
         <li><a class="navbar-link" href="{{ url_for('users.profile') }}">Profile</a></li>
