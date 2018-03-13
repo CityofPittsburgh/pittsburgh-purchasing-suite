@@ -222,8 +222,7 @@ def company(company_id):
     company = Company.query.get(company_id)
 
     if company:
-        current_app.logger.info('WEXCOMPANY - Viewed company page: {}'.format(
-            company.company_name.decode('utf-8').encode('ascii', 'ignore')))
+        current_app.logger.info('WEXCOMPANY - Viewed company page id: {}'.format(company.id))
         return dict(
             company=company,
             choices=Department.choices(),
