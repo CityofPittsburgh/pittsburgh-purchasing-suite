@@ -432,6 +432,7 @@ class OpportunityForm(CategoryForm):
         1. Pops off categories
         2. Pops off documents (they are handled separately)
         3. Sets the foreign keys Opportunity model relationships
+        4. Removes csrf token
 
         Returns:
             An ``opportunity_data`` dictionary, which can be used to
@@ -440,6 +441,7 @@ class OpportunityForm(CategoryForm):
         '''
         opportunity_data = self.pop_categories(categories=False)
         opportunity_data.pop('documents')
+        opportunity_data.pop('csrf_token', None)
 
         opportunity_data['department_id'] = self.department.data.id
         opportunity_data['contact_id'] = parse_contact(opportunity_data.pop('contact_email'), self.department.data)
