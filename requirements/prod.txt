@@ -7,7 +7,7 @@ Werkzeug==0.14.1
 # Database
 Flask-SQLAlchemy==2.2
 SQLAlchemy==1.1.9
-psycopg2==2.7.4
+psycopg2-binary==2.7.4
 
 # Migrations
 Flask-Migrate==2.0.3
@@ -25,8 +25,8 @@ jsmin>=2.1.1
 Flask-S3==0.1.7
 
 # Auth
-Flask-Security==1.7.5
-Flask-Login==0.3.2
+Flask-Security==3.0.0
+Flask-Login==0.4.1
 Flask-Bcrypt==0.7.1
 
 # Caching
