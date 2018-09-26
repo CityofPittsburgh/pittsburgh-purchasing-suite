@@ -45,6 +45,9 @@
     {% block content %}
       <div class="container">
         {% include "includes/flashes.html" %}
+        {% block shutdown %}
+          {% include 'includes/shutdown.html' %}
+        {% endblock %}
       </div>
     {% endblock %}
   </div>
