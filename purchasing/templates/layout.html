@@ -43,11 +43,11 @@
 
   <div role="main" class="main">
     {% block content %}
+      {% block shutdown %}
+        {% include 'includes/shutdown.html' %}
+      {% endblock %}
       <div class="container">
         {% include "includes/flashes.html" %}
-        {% block shutdown %}
-          {% include 'includes/shutdown.html' %}
-        {% endblock %}
       </div>
     {% endblock %}
   </div>
