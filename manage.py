@@ -199,11 +199,12 @@ def upload_assets(user, secret, bucket, _retries=5):
     print 'Uploading files...'
 
     for path in proc.communicate()[0].split('\n')[:-1]:
-        key = path.split('public')[1]
+        print 'Found built package: ' + path
+        key = path.split('public/')[1]
         print 'Uploading {}'.format(key)
         while retries <= _retries:
             try:
-                upload_file(key, bucket, root=current_app.config['APP_DIR'] + '/static')
+                upload_file(key, bucket, root=current_app.config['APP_DIR'] + '/static/')
                 break
             except Exception, e:
                 print 'Error: {}'.format(e), 'Retrying...'
@@ -252,6 +253,7 @@ def upload_assets(user, secret, bucket, _retries=5):
             retries += 1
     return
 
+
 @manager.command
 def all_clear():
     status = AppStatus.query.first()
@@ -261,7 +263,6 @@ def all_clear():
     db.session.commit()
     print 'All clear!'
     return
-
 
 
 @manager.option('-r', '--s3user', dest='user')
